@@ -29,11 +29,10 @@ public class MainActivity extends AppCompatActivity {
         listViewmenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, arrMenu.get(position).getName(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, arrMenu.get(position).getName(),Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
                 intent.putExtra("NameService",arrMenu.get(position).getName());
                 startActivity(intent);
-                setContentView(R.layout.activity_maps);
             }
         });
     }
