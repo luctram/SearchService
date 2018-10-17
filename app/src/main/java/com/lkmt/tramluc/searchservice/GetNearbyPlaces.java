@@ -52,7 +52,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
 
     private void DisplayNearbyPlaces(List<HashMap<String, String>> nearByPlacesList)
     {
-        for (int i=0; i< nearByPlacesList.size(); i++)
+           for (int i=0; i< nearByPlacesList.size(); i++)
         {
             MarkerOptions markerOptions = new MarkerOptions();
 

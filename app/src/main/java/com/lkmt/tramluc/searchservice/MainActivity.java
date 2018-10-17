@@ -3,24 +3,71 @@ package com.lkmt.tramluc.searchservice;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import com.lkmt.tramluc.searchservice.ListServices;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    DatabaseReference mData;
     ListView listViewmenu;
     ArrayList<Menu> arrMenu;
     MenuAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        String[] listCities = new String[]{"Thành phố Hồ Chí Minh","Hà Nội","Nha Trang","Vũng Tàu","Phan Thiết","Đà Lạt","Cần Thơ", "Đà Nẵng","Sa Pa"};
+
+        mData = FirebaseDatabase.getInstance().getReference();
+////
+////        for(int i=0; i< listCities.length; i++){
+////            mData.child("cities").push().setValue(listCities[i]);
+////        }
+
+//        DetailServices detailServices = new DetailServices("ád",0.0,9.0,"cfg","sad","ád","ád",3,1,"ád","Ad");
+//        ListServices listServices;
+//        listServices = new ListServices("atm","ATM");
+//        mData.child("services").push().setValue(listServices);
+
+//        listServices = new ListServices("museum","Khu du lịch");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("restaurant","Quán ăn");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("cafe","Cafe/Kem");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("chtl","Cửa hàng tiện lợi/Tạp hóa");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("hotel","Khách sạn/Nhà nghỉ");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("bar","Quán bar");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("tttm","Trung tâm thương mại");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("supermarket","Siêu thị");
+//        mData.child("services").push().setValue(listServices);
+//
+//        listServices = new ListServices("gas_station","Trạm xăng");
+//        mData.child("services").push().setValue(listServices);
+
 
         anhxa();
         adapter = new MenuAdapter(this,R.layout.row_listview_menu,arrMenu);

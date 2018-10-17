@@ -19,6 +19,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,13 +40,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 
 import java.io.IOException;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    String serviceName, place;
+
+    Button btnAddRadius;
+    String serviceName, placenName,place, namePlace;
     TextView serviceName1;
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
@@ -53,7 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
     private double latitide, longitude;
-    private int ProximityRadius = 10000;
+    private int ProximityRadius = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +78,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         serviceName = intent.getStringExtra("NameService");
         serviceName1 = (TextView) findViewById(R.id.serviceName);
         serviceName1.setText("  "+serviceName);
-        place = checkService(serviceName);
+        placenName = checkService(serviceName);
+        String[] arStr = placenName.split("/");
+        place = arStr[0];
+        namePlace = arStr[1];
+
+        btnAddRadius = (Button) findViewById(R.id.btnIncre);
+        btnAddRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProximityRadius += 1000;
+                Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 
@@ -127,7 +144,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 else
                 {
-                    Toast.makeText(this, "Permission Denied...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Từ chối cấp quyền", Toast.LENGTH_SHORT).show();
                 }
                 return;
         }
@@ -191,14 +208,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
         currentUserLocationMarker = mMap.addMarker(markerOptions);
-
+        currentUserLocationMarker.showInfoWindow();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
 
         if (googleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
-Log.d("123456",place);
+        Log.d("123",latitide + " " + longitude);
         nearPlaces(place,latitide,longitude);
     }
 
@@ -214,71 +231,82 @@ Log.d("123456",place);
         transferData[0] = mMap;
         transferData[1] = url;
         getNearbyPlaces.execute(transferData);
-        Toast.makeText(this, "Đang tìm " + place, Toast.LENGTH_SHORT).show();
-        Log.d("123",url);
+        Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
+        Log.d("1234",url);
     }
 
     private String getUrl(double latitide, double longitude, String nearbyPlace)
     {
         StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googleURL.append("location=" + latitide + "," + longitude);
-        googleURL.append("&radius=" + 10000);
+        googleURL.append("&radius=" + ProximityRadius);
         googleURL.append("&types=" + nearbyPlace);
         googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
 
         return googleURL.toString();
     }
 
+
     private String checkService(String serviceName) {
         String place = "";
         switch (serviceName) {
             case "ATM": {
                 place = "atm";
+                namePlace ="ATM";
                 break;
             }
 
             case "Khu du lịch": {
                 place = "amusement_park";//art_gallery, campground, museum, park, zoo
+                namePlace = "khu du lịch";
                 break;
             }
 
             case "Quán ăn": {
                 place = "restaurant";
+                namePlace ="quán ăn";
                 break;
             }
 
             case "Cafe/Kem": {
                 place = "cafe";
+                namePlace ="cafe/kem";
                 break;
             }
 
             case "Cửa hàng tiện lợi/Tạp hóa": {
                 place = "convenience_store"; //department_store
+                namePlace ="cửa hàng tiện lợi/tạp hóa";
                 break;
             }
 
             case "Khách sạn/Nhà nghỉ": {
                 place = "hotel";
+                namePlace ="khách sạn/nhà nghỉ";
                 break;
             }
 
             case "Quán bar": {
                 place = "bar"; //night_club
+                namePlace ="quán bar";
                 break;
             }
 
             case "Trung tâm thương mại": {
                 place = "shopping_mall";
+                namePlace ="trung tâm thương mại";
                 break;
             }
 
             case "Siêu thị": {
                 place = "supermarket";
+                namePlace ="siêu thị";
                 break;
             }
 
             case "Trạm xăng": {
                 place = "gas_station";
+                namePlace ="trạm xăng";
                 break;
             }
 
@@ -286,7 +314,7 @@ Log.d("123456",place);
                 break;
             }
         }
-        return place;
+        return place+"/"+namePlace;
     }
 
 }
