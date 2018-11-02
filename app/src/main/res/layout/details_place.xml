@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="380dp"
+        android:layout_height="325dp"
+        android:layout_marginBottom="500dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.463">
+
+        <TextView
+            android:id="@+id/detail_Name"
+            android:layout_width="280dp"
+            android:layout_height="37dp"
+            android:layout_centerVertical="true"
+            android:background="#F6CECE"
+            android:text="Shopping mall"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/detail_OpenNow"
+            android:layout_width="103dp"
+            android:layout_height="37dp"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/detail_Name"
+            android:background="#F6CECE"
+            android:gravity="center"
+            android:text="Đang mở cửa"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtAddress"
+            android:layout_width="66dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/detail_Name"
+            android:gravity="center_vertical"
+            android:text="  Địa chỉ: "
+            android:textColor="@android:color/background_dark"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtPhone"
+            android:layout_width="108dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/txtAddress"
+            android:gravity="center_vertical"
+            android:text="  Số điện thoại:"
+            android:textColor="@android:color/background_dark"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/detail_OpenHour"
+            android:layout_width="137dp"
+            android:layout_height="25dp"
+            android:layout_below="@+id/txtPhone"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="@android:color/background_dark"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/detail_Rating"
+            android:layout_width="121dp"
+            android:layout_height="25dp"
+            android:layout_below="@+id/txtPhone"
+            android:layout_toEndOf="@+id/detail_OpenHour"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/detail_CountLike"
+            android:layout_width="121dp"
+            android:layout_height="25dp"
+            android:layout_below="@+id/txtPhone"
+            android:layout_toEndOf="@+id/detail_Rating"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="@android:color/background_dark"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/detail_km"
+            android:layout_width="190dp"
+            android:layout_height="22dp"
+            android:layout_below="@+id/detail_OpenHour"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="@android:color/background_dark" />
+
+        <TextView
+            android:id="@+id/detail_hours"
+            android:layout_width="190dp"
+            android:layout_height="22dp"
+            android:layout_below="@+id/detail_OpenHour"
+            android:layout_toEndOf="@+id/detail_km"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="@android:color/background_dark" />
+
+        <Button
+            android:id="@+id/btnGo"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_below="@+id/detail_km"
+            android:background="@android:color/holo_red_light"
+            android:text="Chỉ đường"
+            android:textColor="@android:color/background_light"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/detail_Address"
+            android:layout_width="313dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/detail_Name"
+            android:layout_toEndOf="@+id/txtAddress"
+            android:gravity="center_vertical"
+            android:text="TextView"
+            android:textColor="@android:color/background_dark" />
+
+        <TextView
+            android:id="@+id/detail_PhoneNumber"
+            android:layout_width="271dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/txtAddress"
+            android:layout_toEndOf="@+id/txtPhone"
+            android:gravity="center_vertical"
+            android:text="TextView"
+            android:textColor="@android:color/background_dark" />
+
+    </RelativeLayout>
+</android.support.constraint.ConstraintLayout>

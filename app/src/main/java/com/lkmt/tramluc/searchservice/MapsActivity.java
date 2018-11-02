@@ -59,6 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int Request_User_Location_Code = 99;
     private double latitide, longitude;
     private int ProximityRadius = 1000;
+    private static final int LOCATION_REQUEST =500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,7 +221,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private  void nearPlaces(String place, double lat, double lng){
+    private void nearPlaces(String place, double lat, double lng){
         List<Address> addressList = null;
         MarkerOptions userMarkerOptions = new MarkerOptions();
         Geocoder geocoder = new Geocoder(this);
@@ -232,7 +233,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         transferData[1] = url;
         getNearbyPlaces.execute(transferData);
         Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
-        Log.d("1234",url);
+    }
+
+    private void getDetailPlace(String placeid){
+        String url = getDetailUrl(placeid);
+        String addressPlace, phonePlace, namePlace, ratingPlace, openHours, websitePlace;
+        ReviewService reviewPlace;
+        Boolean openNow;
+
+
     }
 
     private String getUrl(double latitide, double longitude, String nearbyPlace)
@@ -241,11 +250,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googleURL.append("location=" + latitide + "," + longitude);
         googleURL.append("&radius=" + ProximityRadius);
         googleURL.append("&types=" + nearbyPlace);
+        googleURL.append("&language=vi");
         googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
 
         return googleURL.toString();
     }
 
+
+    private String getDetailUrl (String placeId){
+        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
+
+        googleURL.append("placeid="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
+        googleURL.append("&fields=name,rating,formatted_phone_number,formatted_address,opening_hours,website");
+        googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
+
+        Log.d("OK123",""+googleURL);
+        return googleURL.toString();
+    }
 
     private String checkService(String serviceName) {
         String place = "";
@@ -316,6 +337,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         return place+"/"+namePlace;
     }
+
 
 }
 

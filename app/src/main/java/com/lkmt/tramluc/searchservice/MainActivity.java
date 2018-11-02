@@ -1,6 +1,8 @@
 package com.lkmt.tramluc.searchservice;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,14 +11,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.lkmt.tramluc.searchservice.ListServices;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.lkmt.tramluc.searchservice.TypeServices;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    private GoogleMap mMap;
     DatabaseReference mData;
     ListView listViewmenu;
     ArrayList<Menu> arrMenu;
@@ -37,37 +43,37 @@ public class MainActivity extends AppCompatActivity {
 ////        }
 
 //        DetailServices detailServices = new DetailServices("ád",0.0,9.0,"cfg","sad","ád","ád",3,1,"ád","Ad");
-//        ListServices listServices;
-//        listServices = new ListServices("atm","ATM");
-//        mData.child("services").push().setValue(listServices);
-
-//        listServices = new ListServices("museum","Khu du lịch");
-//        mData.child("services").push().setValue(listServices);
+//        TypeServices listServices;
+//        listServices = new TypeServices("atm","ATM");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("restaurant","Quán ăn");
-//        mData.child("services").push().setValue(listServices);
+//        listServices = new TypeServices("museum","Khu du lịch");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("cafe","Cafe/Kem");
-//        mData.child("services").push().setValue(listServices);
+//        listServices = new TypeServices("restaurant","Quán ăn");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("chtl","Cửa hàng tiện lợi/Tạp hóa");
-//        mData.child("services").push().setValue(listServices);
+//        listServices = new TypeServices("cafe","Cafe/Kem");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("hotel","Khách sạn/Nhà nghỉ");
-//        mData.child("services").push().setValue(listServices);
+//        listServices = new TypeServices("chtl","Cửa hàng tiện lợi/Tạp hóa");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("bar","Quán bar");
-//        mData.child("services").push().setValue(listServices);
+//        listServices = new TypeServices("hotel","Khách sạn/Nhà nghỉ");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("tttm","Trung tâm thương mại");
-//        mData.child("services").push().setValue(listServices);
+//        listServices = new TypeServices("bar","Quán bar");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("supermarket","Siêu thị");
-//        mData.child("services").push().setValue(listServices);
+//        listServices = new TypeServices("tttm","Trung tâm thương mại");
+//        mData.child("TypeServices").push().setValue(listServices);
 //
-//        listServices = new ListServices("gas_station","Trạm xăng");
-//        mData.child("services").push().setValue(listServices);
-
+//        listServices = new TypeServices("supermarket","Siêu thị");
+//        mData.child("TypeServices").push().setValue(listServices);
+//
+//        listServices = new TypeServices("gas_station","Trạm xăng");
+//        mData.child("TypeServices").push().setValue(listServices);
+//
 
         anhxa();
         adapter = new MenuAdapter(this,R.layout.row_listview_menu,arrMenu);
@@ -99,5 +105,31 @@ public class MainActivity extends AppCompatActivity {
         arrMenu.add(new Menu("Siêu thị",R.mipmap.sieuthi1));
         arrMenu.add(new Menu("Trạm xăng",R.mipmap.cayxang1));
 
+    }
+
+    private  void nearPlaces(String place, double lat, double lng){
+        List<Address> addressList = null;
+        MarkerOptions userMarkerOptions = new MarkerOptions();
+        Geocoder geocoder = new Geocoder(this);
+        Object transferData[] = new Object[2];
+        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+
+        String url = getUrl(lat, lng, place);
+        transferData[0] = mMap;
+        transferData[1] = url;
+        getNearbyPlaces.execute(transferData);
+        Toast.makeText(this, "Đang tìm " , Toast.LENGTH_SHORT).show();
+        Log.d("1234",url);
+    }
+
+    private String getUrl(double latitide, double longitude, String nearbyPlace)
+    {
+        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googleURL.append("location=" + latitide + "," + longitude);
+        googleURL.append("&radius=" + 1000);
+        googleURL.append("&types=" + nearbyPlace);
+        googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
+
+        return googleURL.toString();
     }
 }

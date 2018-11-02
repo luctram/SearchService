@@ -52,16 +52,20 @@ public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
 
     private void DisplayNearbyPlaces(List<HashMap<String, String>> nearByPlacesList)
     {
+
+        Services sv;
            for (int i=0; i< nearByPlacesList.size(); i++)
         {
             MarkerOptions markerOptions = new MarkerOptions();
 
             HashMap<String, String> googleNearbyPlace = nearByPlacesList.get(i);
-            String nameOfPlace = googleNearbyPlace.get("place_name");
-            String vicinity = googleNearbyPlace.get("vicinity");
+            String nameOfPlace = googleNearbyPlace.get("place_name"); // name
+            String vicinity = googleNearbyPlace.get("vicinity"); // address
+            String place_id = googleNearbyPlace.get("place_id");
             double lat = Double.parseDouble(googleNearbyPlace.get("lat"));
             double lng = Double.parseDouble(googleNearbyPlace.get("lng"));
 
+            Log.d("123456",place_id+"");
             LatLng latLng = new LatLng(lat, lng);
             markerOptions.position(latLng);
             markerOptions.title(nameOfPlace + " : " + vicinity);
