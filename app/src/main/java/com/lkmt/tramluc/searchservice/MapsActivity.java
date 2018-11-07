@@ -235,14 +235,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
     }
 
-    private void getDetailPlace(String placeid){
-        String url = getDetailUrl(placeid);
-        String addressPlace, phonePlace, namePlace, ratingPlace, openHours, websitePlace;
-        ReviewService reviewPlace;
-        Boolean openNow;
-
-
-    }
 
     private String getUrl(double latitide, double longitude, String nearbyPlace)
     {
@@ -257,16 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private String getDetailUrl (String placeId){
-        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
 
-        googleURL.append("placeid="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
-        googleURL.append("&fields=name,rating,formatted_phone_number,formatted_address,opening_hours,website");
-        googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
-
-        Log.d("OK123",""+googleURL);
-        return googleURL.toString();
-    }
 
     private String checkService(String serviceName) {
         String place = "";
