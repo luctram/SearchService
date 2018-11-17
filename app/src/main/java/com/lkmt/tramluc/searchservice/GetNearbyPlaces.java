@@ -2,8 +2,15 @@ package com.lkmt.tramluc.searchservice;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.animation.LayoutAnimationController;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -15,15 +22,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
+public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
     private String googleplaceData, url;
     private GoogleMap mMap;
-    private JSONObject googlePlaceJSON;
-
+    private Map<String, Integer> mMarkers = new HashMap<String, Integer>();
+    private List<DetailPlace> mData = new ArrayList<DetailPlace>();
+    public CallBackMap callback;
+    public void setCallBack(CallBackMap callback){
+        this.callback = callback;
+    }
     @Override
     protected String doInBackground(Object... objects)
     {
@@ -50,19 +65,22 @@ public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
         List<HashMap<String, String>> nearByPlacesList = null;
         DataParser dataParser = new DataParser();
         nearByPlacesList = dataParser.parse(s);
-
-        DisplayNearbyPlaces(nearByPlacesList);
+        try {
+            DisplayNearbyPlaces(nearByPlacesList);
+        }
+        catch (IOException err){
+            Log.d("IOex", "onPostExecute: "+ err.getMessage());
+        }
     }
 
 
-    private void DisplayNearbyPlaces(List<HashMap<String, String>> nearByPlacesList)
+    private void DisplayNearbyPlaces(List<HashMap<String, String>> nearByPlacesList) throws IOException
     {
 
         Services sv;
-           for (int i=0; i< nearByPlacesList.size(); i++)
+        for (int i=0; i< nearByPlacesList.size(); i++)
         {
             MarkerOptions markerOptions = new MarkerOptions();
-
             HashMap<String, String> googleNearbyPlace = nearByPlacesList.get(i);
             String nameOfPlace = googleNearbyPlace.get("place_name"); // name
             String vicinity = googleNearbyPlace.get("vicinity"); // address
@@ -75,44 +93,40 @@ public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
             markerOptions.title(nameOfPlace + " : " + vicinity);
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
 
-            getDetailPlace(place_id+"");
-            mMap.addMarker(markerOptions);
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-        }
-    }
+            mData.add(getDetailPlace(place_id+""));
+            Marker marker = mMap.addMarker(markerOptions);
 
-    private void getDetailPlace(String placeid) {
-        String url = getDetailUrl(placeid);
-        String addressPlace, phonePlace, namePlace, ratingPlace, openHours, websitePlace;
-        ReviewService reviewPlace;
-        Boolean openNow;
-        phonePlace="";
-        try {
-            if (!googlePlaceJSON.isNull("name")) { // sai ở đây, k lấy đc json để gán
-                namePlace = googlePlaceJSON.getJSONObject("result").getString("name");
-            }
+            mMarkers.put(marker.getId(),i);
 
-            if (!googlePlaceJSON.isNull("formatted_phone_number")) {
-                phonePlace = googlePlaceJSON.getJSONObject("result").getString("formatted_phone_number");
-            }
-        }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
+//            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }
 
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                try {
-                    Log.d("123456", "OK" + " " + googlePlaceJSON.getJSONObject("result").getString("name"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return false;
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker){
+                        int i =   mMarkers.get(marker.getId());
+                        DetailPlace data = mData.get(i);
+                        callback.notifyViewStatus(data);
+                    return false;
             }
         });
+    }
+
+    private DetailPlace getDetailPlace(String placeid) throws IOException{
+        String url = getDetailUrl(placeid);
+        ObjectMapper mapper = new ObjectMapper();
+        DetailPlace data = null;
+        try {
+            data = mapper.readValue(new URL(url), DetailPlace.class);
+        }
+        catch (MalformedURLException err){
+            Log.d("ChecckERR", err.getMessage()+"");
+        }
+        catch (IOException err){
+            Log.d("ChecckERR1", err.getMessage()+"");
+        }
+        return data;
 
     }
 
@@ -120,7 +134,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
         StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
 
         googleURL.append("placeid="+ placeId);
-        googleURL.append("&fields=name,rating,formatted_phone_number,formatted_address,opening_hours,website");
+        googleURL.append("&fields=name,rating,formatted_phone_number,formatted_address,opening_hours,website,reviews");
         googleURL.append("&key="+"AIzaSyAgfFbBLZ-XfwSwBgZ1ztkRd2R3JLq03Kc");
 
         Log.d("OK123",""+googleURL);

@@ -45,7 +45,7 @@ import com.google.firebase.database.DatabaseReference;
 import java.io.IOException;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsActivity extends FragmentActivity implements CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
     Button btnAddRadius;
@@ -60,6 +60,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double latitide, longitude;
     private int ProximityRadius = 1000;
     private static final int LOCATION_REQUEST =500;
+    TextView detailName = null, detailOpenNow=null, detailOpenHour=null, detailRating=null,detailCountLike=null,detailKm=null,detailHours=null,detailAddress=null,detailPhoneNumber=null;
+    Button btnGo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,15 +229,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Geocoder geocoder = new Geocoder(this);
         Object transferData[] = new Object[2];
         GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-
+        getNearbyPlaces.setCallBack(this);
         String url = getUrl(lat, lng, place);
         transferData[0] = mMap;
         transferData[1] = url;
         getNearbyPlaces.execute(transferData);
         Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
+
+
+
+
+
     }
 
+    private void setUp(){
+        detailName = (TextView) findViewById(R.id.detail_Name);
+        detailAddress = (TextView) findViewById(R.id.detail_Address);
 
+        detailPhoneNumber = (TextView) findViewById(R.id.detail_PhoneNumber);
+
+        detailOpenHour = (TextView) findViewById(R.id.detail_OpenHour);
+
+        detailOpenNow = (TextView) findViewById(R.id.detail_OpenNow);
+
+        detailRating = (TextView) findViewById(R.id.detail_Rating);
+
+        detailCountLike = (TextView) findViewById(R.id.detail_CountLike);
+
+        detailHours = (TextView) findViewById(R.id.detail_hours);
+
+        detailKm = (TextView) findViewById(R.id.detail_km);
+    }
     private String getUrl(double latitide, double longitude, String nearbyPlace)
     {
         StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
@@ -322,5 +346,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    @Override
+    public void notifyViewStatus(DetailPlace data) {
+        detailName.setText(data.result.get(0).name);
+        detailAddress.setText(data.result.get(0).formatted_address);
+        detailPhoneNumber.setText(data.result.get(0).formatted_phone_number);
+        detailOpenHour = (TextView) findViewById(R.id.detail_OpenHour);
+        detailOpenNow.setText(data.result.get(0).opening_hours.open_now.toString());
+        detailRating.setText(data.result.get(0).rating.toString());
+
+//        detailCountLike.setText(data.result.get(0).);
+
+        detailHours = (TextView) findViewById(R.id.detail_hours);
+
+        detailKm = (TextView) findViewById(R.id.detail_km);
+    }
 }
 

@@ -3,6 +3,7 @@ package com.lkmt.tramluc.searchservice;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
 //        String[] listCities = new String[]{"Thành phố Hồ Chí Minh","Hà Nội","Nha Trang","Vũng Tàu","Phan Thiết","Đà Lạt","Cần Thơ", "Đà Nẵng","Sa Pa"};
 
@@ -74,7 +78,9 @@ public class MainActivity extends AppCompatActivity {
 //        listServices = new TypeServices("gas_station","Trạm xăng");
 //        mData.child("TypeServices").push().setValue(listServices);
 //
-
+        TabHost.TabSpec c = (TabHost.TabSpec) findViewById(R.id.tab1);
+        TabHost tabs = (TabHost) findViewById(R.id.tabs);
+        tabs.addTab();
         anhxa();
         adapter = new MenuAdapter(this,R.layout.row_listview_menu,arrMenu);
         listViewmenu.setAdapter(adapter);
@@ -93,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
     private void anhxa(){
         listViewmenu = (ListView) findViewById(R.id.listview);
         arrMenu = new ArrayList<Menu>();
-
         arrMenu.add(new Menu("ATM",R.mipmap.atm));
         arrMenu.add(new Menu("Khu du lịch",R.mipmap.kvc1));
         arrMenu.add(new Menu("Quán ăn",R.mipmap.quanan1));
@@ -107,29 +112,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private  void nearPlaces(String place, double lat, double lng){
-        List<Address> addressList = null;
-        MarkerOptions userMarkerOptions = new MarkerOptions();
-        Geocoder geocoder = new Geocoder(this);
-        Object transferData[] = new Object[2];
-        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-
-        String url = getUrl(lat, lng, place);
-        transferData[0] = mMap;
-        transferData[1] = url;
-        getNearbyPlaces.execute(transferData);
-        Toast.makeText(this, "Đang tìm " , Toast.LENGTH_SHORT).show();
-        Log.d("1234",url);
-    }
-
-    private String getUrl(double latitide, double longitude, String nearbyPlace)
-    {
-        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        googleURL.append("location=" + latitide + "," + longitude);
-        googleURL.append("&radius=" + 1000);
-        googleURL.append("&types=" + nearbyPlace);
-        googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
-
-        return googleURL.toString();
-    }
+//    private  void nearPlaces(String place, double lat, double lng){
+//        List<Address> addressList = null;
+//        MarkerOptions userMarkerOptions = new MarkerOptions();
+//        Geocoder geocoder = new Geocoder(this);
+//        Object transferData[] = new Object[2];
+//        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+//
+//        String url = getUrl(lat, lng, place);
+//        transferData[0] = mMap;
+//        transferData[1] = url;
+//        getNearbyPlaces.execute(transferData);
+//        Toast.makeText(this, "Đang tìm " , Toast.LENGTH_SHORT).show();
+//        Log.d("1234",url);
+//    }
+//
+//    private String getUrl(double latitide, double longitude, String nearbyPlace)
+//    {
+//        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+//        googleURL.append("location=" + latitide + "," + longitude);
+//        googleURL.append("&radius=" + 1000);
+//        googleURL.append("&types=" + nearbyPlace);
+//        googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
+//
+//        return googleURL.toString();
+//    }
 }

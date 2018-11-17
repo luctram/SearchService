@@ -4,7 +4,7 @@ public class ReviewService {
     private String authorName;
     private String reviewTxt;
     private String time;
-    private int rate;
+    private int reviewRating;
 
     public ReviewService() {
     }
@@ -13,6 +13,6 @@ public class ReviewService {
         this.authorName = authorName;
         this.reviewTxt = reviewTxt;
         this.time = time;
-        this.rate = rate;
+        this.reviewRating = rate;
     }
 }

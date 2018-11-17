@@ -20,7 +20,6 @@ public class DownloadUrl {
             URL url = new URL(placeURL);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.connect();
-
             inputStream = httpURLConnection.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuffer stringBuffer = new StringBuffer();
@@ -45,8 +44,12 @@ public class DownloadUrl {
         }
         finally
         {
-            inputStream.close();
-            httpURLConnection.disconnect();
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (httpURLConnection != null ) {
+                httpURLConnection.disconnect();
+            }
         }
 
         return Data;

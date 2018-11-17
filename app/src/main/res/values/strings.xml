@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SearchService</string>
     <string name="map_api_key">AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw</string>
+    <string name="icon_direction">#f5eb</string>
 </resources>
