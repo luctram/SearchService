@@ -1,22 +1,17 @@
 package com.lkmt.tramluc.searchservice;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,18 +26,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
 
-import java.io.IOException;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -79,7 +69,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         mapFragment.getMapAsync(this);
         Intent intent = getIntent();
         serviceName = intent.getStringExtra("NameService");
-        serviceName1 = (TextView) findViewById(R.id.serviceName);
+        serviceName1 = (TextView) findViewById(R.id.txtplaceName);
         serviceName1.setText("  "+serviceName);
         placenName = checkService(serviceName);
         String[] arStr = placenName.split("/");
@@ -253,8 +243,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         detailOpenNow = (TextView) findViewById(R.id.detail_OpenNow);
 
         detailRating = (TextView) findViewById(R.id.detail_Rating);
-
-        detailCountLike = (TextView) findViewById(R.id.detail_CountLike);
 
         detailHours = (TextView) findViewById(R.id.detail_hours);
 

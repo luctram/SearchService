@@ -78,9 +78,7 @@ public class MainActivity extends AppCompatActivity {
 //        listServices = new TypeServices("gas_station","Trạm xăng");
 //        mData.child("TypeServices").push().setValue(listServices);
 //
-        TabHost.TabSpec c = (TabHost.TabSpec) findViewById(R.id.tab1);
-        TabHost tabs = (TabHost) findViewById(R.id.tabs);
-        tabs.addTab();
+
         anhxa();
         adapter = new MenuAdapter(this,R.layout.row_listview_menu,arrMenu);
         listViewmenu.setAdapter(adapter);

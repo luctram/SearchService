@@ -7,12 +7,10 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/serviceName"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:background="@mipmap/ic_launcher"
+        android:id="@+id/txtplaceName"
+        android:layout_width="340dp"
+        android:layout_height="50dp"
+        android:background="@android:color/darker_gray"
         android:fontFamily="sa"
         android:gravity="center_vertical"
         android:text=" Trung tâm thương mại"
@@ -20,7 +18,6 @@
         android:textSize="27sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TabHost
@@ -29,7 +26,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/serviceName">
+        app:layout_constraintTop_toBottomOf="@+id/txtplaceName">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -67,5 +64,16 @@
             </FrameLayout>
         </LinearLayout>
     </TabHost>
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toStartOf="@+id/txtplaceName"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/icon_back" />
 
 </android.support.constraint.ConstraintLayout>
