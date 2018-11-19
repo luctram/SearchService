@@ -46,10 +46,11 @@
     <RelativeLayout
         android:id="@+id/detailTable"
         android:layout_width="351dp"
-        android:layout_height="179dp"
+        android:layout_height="133dp"
         android:animateLayoutChanges="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
@@ -76,96 +77,83 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/txtAddress"
-            android:layout_width="66dp"
+            android:id="@+id/detail_Address"
+            android:layout_width="360dp"
             android:layout_height="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="63dp"
+            android:drawableLeft="@mipmap/icon_location1"
+            android:gravity="center_vertical"
+            android:text="TextView"
+            android:textColor="@android:color/background_dark" />
+
+        />
+
+        <ScrollView
+            android:id="@+id/scrollView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_below="@+id/detail_Name"
-            android:gravity="center_vertical"
-            android:text="  Địa chỉ: "
-            android:textColor="@android:color/background_dark"
-            android:textSize="16sp" />
+            android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/txtPhone"
-            android:layout_width="108dp"
-            android:layout_height="30dp"
-            android:layout_below="@+id/txtAddress"
-            android:gravity="center_vertical"
-            android:text="  Số điện thoại:"
-            android:textColor="@android:color/background_dark"
-            android:textSize="16sp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/detail_OpenHour"
-            android:layout_width="137dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/txtPhone"
-            android:gravity="center"
-            android:text="TextView"
-            android:textColor="@android:color/background_dark"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/detail_Rating"
-            android:layout_width="121dp"
-            android:layout_height="25dp"
-            android:layout_below="@+id/txtPhone"
-            android:layout_toEndOf="@+id/detail_OpenHour"
-            android:gravity="center"
-            android:text="TextView"
-            android:textColor="@android:color/holo_red_light"
-            android:textSize="16sp" />
+                <RatingBar
+                    android:id="@+id/rat"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.07"
+                    android:isIndicator="false"
+                    android:numStars="5"
+                    android:rating="5" />
+                />
+            </LinearLayout>
+        </ScrollView>
 
         <TextView
             android:id="@+id/detail_km"
-            android:layout_width="190dp"
-            android:layout_height="22dp"
-            android:layout_below="@+id/detail_OpenHour"
+            android:layout_width="wrap_content"
+            android:layout_height="19dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/detail_Name"
+            android:layout_marginStart="100dp"
+            android:drawableLeft="@mipmap/icon_car1"
             android:gravity="center"
-            android:text="TextView"
-            android:textColor="@android:color/background_dark" />
+            android:text="500m" />
 
-        <TextView
-            android:id="@+id/detail_hours"
-            android:layout_width="190dp"
-            android:layout_height="22dp"
-            android:layout_below="@+id/detail_OpenHour"
-            android:layout_toEndOf="@+id/detail_km"
-            android:gravity="center"
-            android:text="TextView"
-            android:textColor="@android:color/background_dark" />
+        <Button
+            android:id="@+id/btnShowDetail"
+            android:layout_width="258dp"
+            android:layout_height="27dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:layout_marginEnd="-158dp"
+            android:layout_toStartOf="@+id/detail_km"
+            android:background="@android:color/holo_red_light"
+            android:text="Xem chi tiết"
+            android:textColor="@android:color/background_light"
+            android:textSize="16dp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnGo"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_below="@+id/detail_km"
+            android:layout_width="157dp"
+            android:layout_height="26dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/btnShowDetail"
+            android:layout_marginEnd="1dp"
+            android:layout_marginTop="1dp"
             android:background="@android:color/holo_red_light"
+            android:drawableRight="@mipmap/icon_direction1"
             android:text="Chỉ đường"
             android:textColor="@android:color/background_light"
-            android:textSize="18sp"
+            android:textSize="16dp"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/detail_Address"
-            android:layout_width="313dp"
-            android:layout_height="30dp"
-            android:layout_below="@+id/detail_Name"
-            android:layout_toEndOf="@+id/txtAddress"
-            android:gravity="center_vertical"
-            android:text="TextView"
-            android:textColor="@android:color/background_dark" />
-
-        <TextView
-            android:id="@+id/detail_PhoneNumber"
-            android:layout_width="271dp"
-            android:layout_height="30dp"
-            android:layout_below="@+id/txtAddress"
-            android:layout_toEndOf="@+id/txtPhone"
-            android:gravity="center_vertical"
-            android:text="TextView"
-            android:textColor="@android:color/background_dark" />
-
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -50,8 +50,10 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     private double latitide, longitude;
     private int ProximityRadius = 1000;
     private static final int LOCATION_REQUEST =500;
-    TextView detailName = null, detailOpenNow=null, detailOpenHour=null, detailRating=null,detailCountLike=null,detailKm=null,detailHours=null,detailAddress=null,detailPhoneNumber=null;
-    Button btnGo;
+    TextView detailName = null, detailOpenNow=null, detailKm=null,detailAddress=null; //MapsActivity
+    TextView tab_txtRating =null, tab_txtKm=null, tab_txtHour =null,tab_txtAddress=null, tab_txtPhone=null,tab_txtWebsite=null; //tabhost_detail
+    TextView txtplaceName=null; // activityDetailPlace
+    Button btnGo, btnGoDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,18 +237,17 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     private void setUp(){
         detailName = (TextView) findViewById(R.id.detail_Name);
         detailAddress = (TextView) findViewById(R.id.detail_Address);
-
-        detailPhoneNumber = (TextView) findViewById(R.id.detail_PhoneNumber);
-
-        detailOpenHour = (TextView) findViewById(R.id.detail_OpenHour);
-
         detailOpenNow = (TextView) findViewById(R.id.detail_OpenNow);
-
-        detailRating = (TextView) findViewById(R.id.detail_Rating);
-
-        detailHours = (TextView) findViewById(R.id.detail_hours);
-
         detailKm = (TextView) findViewById(R.id.detail_km);
+
+        tab_txtRating = (TextView) findViewById(R.id.tab_txtRating);
+        tab_txtKm=(TextView) findViewById(R.id.tab_txtKm);
+        tab_txtHour =(TextView) findViewById(R.id.tab_txtHour);
+        tab_txtAddress=(TextView) findViewById(R.id .tab_txtAddress);
+        tab_txtPhone= (TextView) findViewById(R.id.tab_txtPhone);
+        tab_txtWebsite=(TextView) findViewById(R.id.tab_txtWebsite);
+
+        txtplaceName = (TextView) findViewById(R.id.txtplaceName);
     }
     private String getUrl(double latitide, double longitude, String nearbyPlace)
     {
@@ -338,16 +339,18 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     public void notifyViewStatus(DetailPlace data) {
         detailName.setText(data.result.get(0).name);
         detailAddress.setText(data.result.get(0).formatted_address);
-        detailPhoneNumber.setText(data.result.get(0).formatted_phone_number);
-        detailOpenHour = (TextView) findViewById(R.id.detail_OpenHour);
         detailOpenNow.setText(data.result.get(0).opening_hours.open_now.toString());
-        detailRating.setText(data.result.get(0).rating.toString());
+//        detailKm = (TextView) findViewById(R.id.detail_km);
 
-//        detailCountLike.setText(data.result.get(0).);
+        //        ta = (TextView) findViewById(R.id.detail_OpenHour);
+        tab_txtPhone.setText(data.result.get(0).formatted_phone_number);
+        tab_txtRating.setText(data.result.get(0).rating.toString());
+//        tab_txtHour = (TextView) findViewById(R.id.detail_hours);
+        tab_txtAddress.setText(data.result.get(0).formatted_address);
+        tab_txtWebsite.setText(data.result.get(0).website);
+//        tab_txtKm =
 
-        detailHours = (TextView) findViewById(R.id.detail_hours);
-
-        detailKm = (TextView) findViewById(R.id.detail_km);
+        txtplaceName.setText(data.result.get(0).name);
     }
 }
 
