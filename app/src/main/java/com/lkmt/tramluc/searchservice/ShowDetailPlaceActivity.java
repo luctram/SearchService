@@ -1,5 +1,6 @@
 package com.lkmt.tramluc.searchservice;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityGroup;
 import android.app.LocalActivityManager;
@@ -7,44 +8,43 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TabHost;
 
 public class ShowDetailPlaceActivity extends AppCompatActivity {
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailplace);
 
-        TabHost tabhost;
-        TabHost.TabSpec tab_detail, tab_reviews;
+        FragmentTabHost tabhost;
+        FragmentTabHost.TabSpec tab_detail, tab_reviews;
         Intent reviewIntent,detailIntent;
-
-        tabhost = (TabHost) findViewById(android.R.id.tabs);
-
+//
+        tabhost = (FragmentTabHost) findViewById(R.id.tabsHost);
+        tabhost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
+//
 //        LocalActivityManager localActivityManager = new LocalActivityManager(this,false);
 //        tabhost.setup(localActivityManager);
-            tabhost.setup();
+//        tabhost.setup();
+//        tabhost.setup();
 
         //Tab show detail
-        tab_detail = tabhost.newTabSpec("Tab one");
-        tab_detail.setContent(R.id.Tab_Detail);
+        tab_detail = tabhost.newTabSpec("Tab one").setIndicator("Tổng quan");
         tab_detail.setIndicator("Tổng quan");
-        detailIntent = new Intent(this,TabHost_DetailPlace.class);
-        tab_detail.setContent(detailIntent);
 
 
         //Tab show reviews
         tab_reviews = tabhost.newTabSpec("Tab two");
-        tab_reviews.setContent(R.id.Tab_Reviews);
         tab_reviews.setIndicator("Xem bình luận");
-        reviewIntent = new Intent(this,TabHost_Reviews.class);
-        tab_reviews.setContent(reviewIntent);
-
-        tabhost.addTab(tab_detail);
-        tabhost.addTab(tab_reviews);
-
+        tabhost.addTab(tab_detail, TabHost_DetailPlace.class,null);
+        tabhost.addTab(tab_reviews, TabHost_Reviews.class,null);
+//        tabhost.addTab(tabhost.newTabSpec("simple").setIndicator("Simple"),
+//                TabHost_DetailPlace.class, null);
+        tabhost.setCurrentTab(0);
 
     }
 }

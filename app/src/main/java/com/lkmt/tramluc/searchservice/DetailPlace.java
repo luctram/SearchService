@@ -3,6 +3,7 @@ package com.lkmt.tramluc.searchservice;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,7 +22,7 @@ public class DetailPlace {
         Number rating;
         String website;
         Opening_Hours opening_hours;
-
+        LatLng latLng;
         public class Opening_Hours{
             Boolean open_now;
             ArrayList<String> weekday_text;

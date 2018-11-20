@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,7 +10,7 @@
         android:layout_width="340dp"
         android:layout_height="50dp"
         android:background="@android:color/darker_gray"
-        android:fontFamily="sa"
+        android:fontFamily="sans-serif"
         android:gravity="center_vertical"
         android:text=" Trung tâm thương mại"
         android:textColor="@android:color/background_dark"
@@ -20,8 +19,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TabHost
-        android:id="@android:id/tabs"
+    <android.support.v4.app.FragmentTabHost
+        android:id="@+id/tabsHost"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,6 +28,7 @@
         app:layout_constraintTop_toBottomOf="@+id/txtplaceName">
 
         <LinearLayout
+            android:id="@+id/detailPlaceContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -45,25 +45,25 @@
 
                 <LinearLayout
                     android:id="@+id/Tab_Detail"
-                    android:text="Tổng quan"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:text="Tổng quan">
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/Tab_Reviews"
-                    android:text="Bài đánh giá"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:text="Bài đánh giá">
 
                 </LinearLayout>
 
             </FrameLayout>
         </LinearLayout>
-    </TabHost>
+    </android.support.v4.app.FragmentTabHost>
 
     <ImageButton
         android:id="@+id/imageButton"

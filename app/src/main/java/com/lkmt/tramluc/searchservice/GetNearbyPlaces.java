@@ -93,13 +93,14 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
             markerOptions.title(nameOfPlace + " : " + vicinity);
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
 
-            mData.add(getDetailPlace(place_id+""));
+            mData.add(getDetailPlace(place_id+"", latLng));
+
             Marker marker = mMap.addMarker(markerOptions);
 
             mMarkers.put(marker.getId(),i);
 
-//            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-//            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }
 
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -113,12 +114,13 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
         });
     }
 
-    private DetailPlace getDetailPlace(String placeid) throws IOException{
+    private DetailPlace getDetailPlace(String placeid, LatLng latLng) throws IOException{
         String url = getDetailUrl(placeid);
         ObjectMapper mapper = new ObjectMapper();
         DetailPlace data = null;
         try {
             data = mapper.readValue(new URL(url), DetailPlace.class);
+            data.result.get(0).latLng = latLng;
         }
         catch (MalformedURLException err){
             Log.d("ChecckERR", err.getMessage()+"");

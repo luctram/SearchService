@@ -2,13 +2,24 @@ package com.lkmt.tramluc.searchservice;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-public class TabHost_Reviews extends AppCompatActivity {
+public class TabHost_Reviews extends Fragment {
 
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tabhost_reviews);
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.tabhost_reviews, container, false);
+        //TextView e = (TextView) v.findViewById(R.id.textView);
+        return v;
     }
 }
