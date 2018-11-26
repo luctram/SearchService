@@ -1,4 +1,4 @@
-package com.lkmt.tramluc.searchservice;
+package com.lkmt.tramluc.searchservice.ModelMenu;
 
 public class Menu {
     private String name;

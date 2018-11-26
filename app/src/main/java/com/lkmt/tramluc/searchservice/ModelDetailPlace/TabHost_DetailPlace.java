@@ -1,4 +1,4 @@
-package com.lkmt.tramluc.searchservice;
+package com.lkmt.tramluc.searchservice.ModelDetailPlace;
 
 import android.app.Activity;
 import android.graphics.Typeface;
@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.lkmt.tramluc.searchservice.R;
 
 public class TabHost_DetailPlace extends Fragment {
 

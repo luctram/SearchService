@@ -2,14 +2,7 @@ package com.lkmt.tramluc.searchservice;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.animation.LayoutAnimationController;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,9 +10,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.CallBackMap;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

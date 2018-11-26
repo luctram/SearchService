@@ -1,5 +1,7 @@
 package com.lkmt.tramluc.searchservice;
 
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.ReviewService;
+
 public class Services {
 
     public String typeServiceId;

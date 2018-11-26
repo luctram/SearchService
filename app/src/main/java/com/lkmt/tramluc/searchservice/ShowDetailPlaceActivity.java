@@ -1,16 +1,13 @@
 package com.lkmt.tramluc.searchservice;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ActivityGroup;
-import android.app.LocalActivityManager;
-import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TabHost;
+
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.TabHost_DetailPlace;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.TabHost_Reviews;
 
 public class ShowDetailPlaceActivity extends AppCompatActivity {
 

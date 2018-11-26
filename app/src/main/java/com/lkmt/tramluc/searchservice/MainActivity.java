@@ -1,27 +1,20 @@
 package com.lkmt.tramluc.searchservice;
 
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TabHost;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.lkmt.tramluc.searchservice.TypeServices;
+import com.lkmt.tramluc.searchservice.ModelMenu.Menu;
+import com.lkmt.tramluc.searchservice.ModelMenu.MenuAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private GoogleMap mMap;

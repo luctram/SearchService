@@ -3,14 +3,13 @@ package com.lkmt.tramluc.searchservice;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.ReviewService;
 
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static org.junit.Assert.*;
 
 public class DetailPlaceTest {
 

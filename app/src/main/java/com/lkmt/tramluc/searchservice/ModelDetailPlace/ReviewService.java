@@ -1,4 +1,4 @@
-package com.lkmt.tramluc.searchservice;
+package com.lkmt.tramluc.searchservice.ModelDetailPlace;
 
 public class ReviewService {
     private String authorName;

@@ -1,4 +1,4 @@
-package com.lkmt.tramluc.searchservice;
+package com.lkmt.tramluc.searchservice.ModelDetailPlace;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.lkmt.tramluc.searchservice.R;
 
 public class TabHost_Reviews extends Fragment {
 
