@@ -127,16 +127,16 @@
 
 
         <Button
-            android:id="@+id/btnGo"
+            android:id="@+id/btnGoDetail"
             android:layout_width="170dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
             android:background="@drawable/button"
             android:drawableTop="@mipmap/icon_direction"
             android:fontFamily="sans-serif"
             android:gravity="center"
             android:text="Chỉ đường"
             android:textSize="20dp"
-            android:layout_marginLeft="100dp"
             android:textStyle="bold" />
 
     </LinearLayout>

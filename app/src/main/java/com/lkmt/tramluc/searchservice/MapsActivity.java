@@ -17,6 +17,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +58,7 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity implements CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
-    Button btnAddRadius;
+
     String serviceName, placenName,place, namePlace;
     TextView serviceName1;
     private GoogleMap mMap;
@@ -64,19 +67,26 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     private Location lastLocation;
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
-    private double latitide, longitude;
+    private double latitude, longitude;
+    private LatLng latLng;
+    private LatLng desLocation;
+    private DetailPlace placeData;
     private int ProximityRadius = 1000;
+    private int Radius = 1;
     private static final int LOCATION_REQUEST =500;
     private List<Polyline> polylinePaths = new ArrayList<>(); // add line of direction
     TextView detailName = null, detailOpenNow=null, detailKm=null,detailAddress=null; //MapsActivity
-    TextView tab_txtRating =null, tab_txtKm=null, tab_txtHour =null,tab_txtAddress=null, tab_txtPhone=null,tab_txtWebsite=null; //tabhost_detail
     TextView txtplaceName=null; // activityDetailPlace
-    Button btnGo, btnGoDetail;
+    Button btnAddRadius ,btnGo, btnGoDetail, btnShowDetail;
+    ImageButton btnDown;
+    RatingBar rat;
+    RelativeLayout detailTable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        setUp();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
@@ -95,30 +105,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         String[] arStr = placenName.split("/");
         place = arStr[0];
         namePlace = arStr[1];
-
-        btnAddRadius = (Button) findViewById(R.id.btnIncre);
-        btnAddRadius.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ProximityRadius += 1000;
-                Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
-            }
-        });
-
-//        btnGo.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//
-//        btnGoDetail.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-
     }
 
 
@@ -232,10 +218,65 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    private void setUp(){
+        detailTable =(RelativeLayout) findViewById(R.id.detailTable);
+        btnAddRadius = (Button) findViewById(R.id.btnIncre);
+        btnDown = (ImageButton) findViewById(R.id.btnDown);
+        btnGo = (Button) findViewById(R.id.btnGo);
+        btnGoDetail = (Button) findViewById(R.id.btnGoDetail);
+        btnShowDetail = (Button) findViewById(R.id.btnShowDetail);
+        detailName = (TextView) findViewById(R.id.detail_Name);
+        detailAddress = (TextView) findViewById(R.id.detail_Address);
+        detailOpenNow = (TextView) findViewById(R.id.detail_OpenNow);
+        detailKm = (TextView) findViewById(R.id.detail_km);
+        rat = (RatingBar) findViewById(R.id.rat);
+
+        txtplaceName = (TextView) findViewById(R.id.txtplaceName);
+
+        btnAddRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProximityRadius=1000;
+                Radius++;
+                ProximityRadius *= Radius;
+                Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
+                Log.d("Radius",ProximityRadius+"");
+                nearPlaces(place,latitude,longitude,ProximityRadius);
+
+            }
+        });
+
+        btnGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDirection(latLng, desLocation);
+            }
+        });
+
+        btnShowDetail.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, ShowDetailPlaceActivity.class);
+                intent.putExtra("DataPlace",placeData);
+                startActivity(intent);
+            }
+        });
+
+        btnDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.clear();
+                detailTable.setVisibility(View.INVISIBLE);
+                onLocationChanged(lastLocation);
+            }
+        });
+    }
+
     @Override
     public void onLocationChanged(Location location)
     {
-        latitide = location.getLatitude();
+        latitude = location.getLatitude();
         longitude = location.getLongitude();
 
         lastLocation = location;
@@ -244,7 +285,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             currentUserLocationMarker.remove();
         }
 
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
@@ -259,41 +300,26 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         if (googleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
-        Log.d("123",latitide + " " + longitude);
-        nearPlaces(place,latitide,longitude);
+        nearPlaces(place, latitude,longitude,ProximityRadius);
     }
 
 
-    private void nearPlaces(String place, double lat, double lng){
+    private void nearPlaces(String place, double lat, double lng, int ProximityRadius){
         List<Address> addressList = null;
         MarkerOptions userMarkerOptions = new MarkerOptions();
         Geocoder geocoder = new Geocoder(this);
         Object transferData[] = new Object[2];
         GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
         getNearbyPlaces.setCallBack(this);
-        String url = getUrl(lat, lng, place);
+        String url = getUrl(lat, lng, place, ProximityRadius );
         transferData[0] = mMap;
         transferData[1] = url;
         getNearbyPlaces.execute(transferData);
-        Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
     }
 
-    private void setUp(){
-        detailName = (TextView) findViewById(R.id.detail_Name);
-        detailAddress = (TextView) findViewById(R.id.detail_Address);
-        detailOpenNow = (TextView) findViewById(R.id.detail_OpenNow);
-        detailKm = (TextView) findViewById(R.id.detail_km);
 
-        tab_txtRating = (TextView) findViewById(R.id.tab_txtRating);
-        tab_txtKm=(TextView) findViewById(R.id.tab_txtKm);
-        tab_txtHour =(TextView) findViewById(R.id.tab_txtHour);
-        tab_txtAddress=(TextView) findViewById(R.id .tab_txtAddress);
-        tab_txtPhone= (TextView) findViewById(R.id.tab_txtPhone);
-        tab_txtWebsite=(TextView) findViewById(R.id.tab_txtWebsite);
-
-        txtplaceName = (TextView) findViewById(R.id.txtplaceName);
-    }
-    private String getUrl(double latitide, double longitude, String nearbyPlace)
+    private String getUrl(double latitide, double longitude, String nearbyPlace, int ProximityRadius)
     {
         StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googleURL.append("location=" + latitide + "," + longitude);
@@ -306,32 +332,61 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     }
 
     @Override
-    public void notifyViewStatus(DetailPlace data) {
-//        detailName.setText("ád"); lỗi setText
-        detailName.setText(data.result.get(0).name);
-        detailAddress.setText(data.result.get(0).formatted_address);
-        detailOpenNow.setText(data.result.get(0).opening_hours.open_now.toString());
-//        detailKm = (TextView) findViewById(R.id.detail_km);
+    public void notifyViewStatus(final DetailPlace data) {
+
+        if (data == null) return;
+
+        detailTable.setVisibility(View.VISIBLE); // Hien thi detail
+        detailName.setText(data.result.name);
+        detailAddress.setText(data.result.formatted_address);
+        if (data.result.opening_hours != null) {
+            if (data.result.opening_hours.open_now != null) {
+                detailOpenNow.setVisibility(View.VISIBLE);
+                if (data.result.opening_hours.open_now == true) {
+                    detailOpenNow.setText("Đang mở cửa");
+                } else {
+                    detailOpenNow.setText("Đã đóng cửa");
+                }
+            } else {
+                detailOpenNow.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        rat.setRating(data.result.rating);
+        desLocation = data.result.latLng;
+        placeData = data;
+//        detailKm = ;
+
+
+
 
         //        ta = (TextView) findViewById(R.id.detail_OpenHour);
-        tab_txtPhone.setText(data.result.get(0).formatted_phone_number);
-        tab_txtRating.setText(data.result.get(0).rating.toString());
-//        tab_txtHour = (TextView) findViewById(R.id.detail_hours);
-        tab_txtAddress.setText(data.result.get(0).formatted_address);
-        tab_txtWebsite.setText(data.result.get(0).website);
-//        tab_txtKm =
+//        tab_txtPhone.setText(data.result.formatted_phone_number);
+//        tab_txtRating.setText(data.result.rating.toString());
+////        tab_txtHour = (TextView) findViewById(R.id.detail_hours);
+//        tab_txtAddress.setText(data.result.formatted_address);
+//        tab_txtWebsite.setText(data.result.website);
+////        tab_txtKm =
 
-        txtplaceName.setText(data.result.get(0).name);
+
+//        txtplaceName.setText(data.result.name);
     }
 
     public void getDirection(LatLng origin, LatLng dest){
-        mMap.addMarker(new MarkerOptions()
-                .position(origin)
-                .title("1"));
+        mMap.clear();
 
-        mMap.addMarker(new MarkerOptions()
-                .position(dest)
-                .title("2"));
+        MarkerOptions markerOrigin = new MarkerOptions();
+        markerOrigin.position(origin);
+        markerOrigin.title("Bạn đang ở đây");
+        markerOrigin.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+        MarkerOptions markerDest = new MarkerOptions();
+        markerDest.position(dest);
+        markerDest.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+
+        mMap.addMarker(markerOrigin);
+        mMap.addMarker(markerDest);
+
 
         String url = getRequestUrl(origin,dest);
         System.out.println(url);
@@ -421,7 +476,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
                 jsonObject = new JSONObject(strings[0]);
                 DirectionsParser directionsParser = new DirectionsParser();
                 routes = directionsParser.parse(jsonObject);
-                Log.d("OK12345",routes.toString());
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -434,6 +488,8 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             ArrayList points = null;
             polylinePaths = new ArrayList<>();
             PolylineOptions polylineOptions =null;
+
+            polylinePaths.clear();
             for (List<HashMap<String,String>> path :lists){
                 points =new ArrayList();
                 polylineOptions = new PolylineOptions();
@@ -443,13 +499,15 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
                     points.add(new LatLng(lat,lng));
                 }
                 polylineOptions.addAll(points);
-                polylineOptions.width(10);
-                polylineOptions.color(R.color.background_floating_material_dark);
+                polylineOptions.width(13);
+                polylineOptions.color(R.color.colorBlue);
                 polylineOptions.geodesic(true);
             }
 
             polylinePaths.add(mMap.addPolyline(polylineOptions));
         }
+
+
     }
 
     private String checkService(String serviceName) {

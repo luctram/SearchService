@@ -1,6 +1,8 @@
 package com.lkmt.tramluc.searchservice.ModelDetailPlace;
 
-public class ReviewService {
+import java.io.Serializable;
+
+public class ReviewService implements Serializable {
     private String authorName;
     private String reviewTxt;
     private String time;

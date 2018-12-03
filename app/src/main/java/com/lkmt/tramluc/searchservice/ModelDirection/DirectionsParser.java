@@ -3,6 +3,7 @@ package com.lkmt.tramluc.searchservice.ModelDirection;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.PolyUtil;
 //import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -52,16 +53,14 @@ public class DirectionsParser {
 
                     JSONObject jStepPolyline = jsonStep.getJSONObject("polyline");
                     steps.polyline = new polyline(jStepPolyline.getString("points"));
-                    Log.d("OK", "parse: " + steps.polyline.toString());
-//                    List list = PolyUtil.decode(jStepPolyline.getString("points"));
+                    List list = PolyUtil.decode(jStepPolyline.getString("points"));
 
-//                    Log.d("OK", "parse2: " + list);
-//                    for (int l = 0; l < list.size(); l++) {
-//                        HashMap<String, String> hm = new HashMap<String, String>();
-//                        hm.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
-//                        hm.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
-//                        path.add(hm);
-//                    }
+                    for (int l = 0; l < list.size(); l++) {
+                        HashMap<String, String> hm = new HashMap<String, String>();
+                        hm.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
+                        hm.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
+                        path.add(hm);
+                    }
 
                     routes.add(path);
                 }

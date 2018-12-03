@@ -3,6 +3,7 @@ package com.lkmt.tramluc.searchservice;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,8 +26,8 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
     private String googleplaceData, url;
     private GoogleMap mMap;
-    private Map<String, Integer> mMarkers = new HashMap<String, Integer>();
-    private List<DetailPlace> mData = new ArrayList<DetailPlace>();
+    private HashMap<String, Integer> mMarkers;
+    private List<DetailPlace> mData;
     public CallBackMap callback;
     public void setCallBack(CallBackMap callback){
         this.callback = callback;
@@ -68,7 +69,8 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
     private void DisplayNearbyPlaces(List<HashMap<String, String>> nearByPlacesList) throws IOException
     {
-
+        mMarkers = new HashMap<String, Integer>();
+        mData = new ArrayList<DetailPlace>();
         Services sv;
         for (int i=0; i< nearByPlacesList.size(); i++)
         {
@@ -88,19 +90,21 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
             mData.add(getDetailPlace(place_id+"", latLng));
 
             Marker marker = mMap.addMarker(markerOptions);
-
             mMarkers.put(marker.getId(),i);
 
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }
-
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker){
-                        int i =   mMarkers.get(marker.getId());
-                        DetailPlace data = mData.get(i);
-                        callback.notifyViewStatus(data);
+
+                        if (mMarkers.get(marker.getId()) != null){
+                            int i = mMarkers.get(marker.getId());
+                            DetailPlace data = mData.get(i);
+                            callback.notifyViewStatus(data);
+                        }
+                        callback.notifyViewStatus(null);
                     return false;
             }
         });
@@ -110,9 +114,11 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
         String url = getDetailUrl(placeid);
         ObjectMapper mapper = new ObjectMapper();
         DetailPlace data = null;
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
         try {
             data = mapper.readValue(new URL(url), DetailPlace.class);
-            data.result.get(0).latLng = latLng;
+            data.result.latLng = latLng;
         }
         catch (MalformedURLException err){
             Log.d("ChecckERR", err.getMessage()+"");
@@ -131,7 +137,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
         googleURL.append("&fields=name,rating,formatted_phone_number,formatted_address,opening_hours,website,reviews");
         googleURL.append("&key="+"AIzaSyAgfFbBLZ-XfwSwBgZ1ztkRd2R3JLq03Kc");
 
-        Log.d("OK123",""+googleURL);
+       // Log.d("OK123",""+googleURL);
         return googleURL.toString();
     }
 }
