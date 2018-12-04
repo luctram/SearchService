@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -84,6 +86,24 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public boolean onCreateOptionMenu(android.view.Menu tabMenu){
+        getMenuInflater().inflate(R.menu.menu, tabMenu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int i = item.getItemId();
+        switch (i){
+            case R.id.Update:
+                Log.d("Check123","OK update");
+                break;
+
+        }
+
+        return true;
     }
 
     private void anhxa(){

@@ -30,6 +30,8 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
         tab_detail = tabhost.newTabSpec("Tab one").setIndicator("Chi tiết");
         tab_detail.setIndicator("Chi tiết");
 
+        tabhost.getTabWidget().getChildAt(0).
+
 
         //Tab show reviews
         tab_reviews = tabhost.newTabSpec("Tab two");
@@ -38,8 +40,16 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
         tabhost.addTab(tab_reviews, TabHost_Reviews.class,null);
         tabhost.setCurrentTab(0);
 
-        Intent intent = getIntent();
-        DetailPlace data = (DetailPlace) intent.getSerializableExtra("DataPlace");
-        Log.d("CHECK123",data.result.name);
+        Intent getData = getIntent();
+        DetailPlace data = (DetailPlace) getData.getParcelableExtra("DataPlace");
+//
+        Intent intentDetail = new Intent(ShowDetailPlaceActivity.this, TabHost_DetailPlace.class);
+        intentDetail.putExtra("DataPlaceTabHost",getData.getParcelableExtra("DataPlace"));
+        tab_detail.setContent(intentDetail);
+////        startActivity(intentDetail);
+//
+//        Intent intentReviews = new Intent(ShowDetailPlaceActivity.this, TabHost_DetailPlace.class);
+//        intentReviews.putExtra("DataPlaceTabHost",getData.getParcelableExtra("DataPlace"));
+////        startActivity(intentReviews);
     }
 }

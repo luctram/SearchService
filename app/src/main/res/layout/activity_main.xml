@@ -23,14 +23,17 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="55dp"
-        android:background="@mipmap/ic_launcher"
+        android:background="@mipmap/background"
+        android:fontFamily="sans-serif"
         android:gravity="center"
         android:text="CHỌN DỊCH VỤ"
         android:textColor="@android:color/background_dark"
         android:textSize="30sp"
-        android:fontFamily="sans-serif"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 </android.support.constraint.ConstraintLayout>
