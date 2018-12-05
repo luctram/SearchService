@@ -1,12 +1,9 @@
 package com.lkmt.tramluc.searchservice.ModelDetailPlace;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.media.Rating;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,32 +19,41 @@ public class TabHost_DetailPlace extends Fragment {
     TextView tab_txtRating =null, tab_txtKm=null, tab_txtHour =null,tab_txtAddress=null, tab_txtPhone=null,tab_txtWebsite=null;
     RatingBar rat;
     Button btnGoDetail;
+    DetailPlace data;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+         //super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.tabhost_detail, container, false);
-        //TextView e = (TextView) v.findViewById(R.id.textView);
-
         tab_txtRating = (TextView) v.findViewById(R.id.tab_txtRating);
         tab_txtKm=(TextView) v.findViewById(R.id.tab_txtKm);
         tab_txtHour =(TextView) v.findViewById(R.id.tab_txtHour);
-        tab_txtAddress=(TextView) v.findViewById(R.id .tab_txtAddress);
+        tab_txtAddress=(TextView) v.findViewById(R.id.tab_txtAddress);
         tab_txtPhone= (TextView) v.findViewById(R.id.tab_txtPhone);
         tab_txtWebsite=(TextView) v.findViewById(R.id.tab_txtWebsite);
-
-        Intent getData = getActivity().getIntent();
-        DetailPlace data = (DetailPlace) getData.getParcelableExtra("DataPlaceTabHost");
+        rat = (RatingBar) v.findViewById(R.id.rat);
+        if (data.result == null){
+            return v;}
         tab_txtAddress.setText(data.result.formatted_address);
         tab_txtPhone.setText(data.result.formatted_phone_number);
         tab_txtWebsite.setText(data.result.website);
         tab_txtRating.setText(data.result.rating + "");
         rat.setRating(data.result.rating);
+        if(data.result.reviews ==null){
+            Log.d("CHECK123","Kco binh luan");
+        }else {
+            Log.d("CHECK123", data.result.reviews.get(0).getauthor_name()+"");
+        }
         return v;
+    }
+
+    public void getData(DetailPlace data){
+       this.data = data;
     }
 }

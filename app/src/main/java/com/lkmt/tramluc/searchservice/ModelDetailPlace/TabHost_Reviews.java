@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.lkmt.tramluc.searchservice.ModelMenu.Menu;
 import com.lkmt.tramluc.searchservice.ModelMenu.MenuAdapter;
@@ -21,6 +22,7 @@ public class TabHost_Reviews extends Fragment {
     ArrayList<Reviews> arrReviews;
     ReviewsAdapter adapter;
     DetailPlace data;
+    TextView txtNullReview;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,22 +33,31 @@ public class TabHost_Reviews extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.tabhost_reviews, container, false);
         //TextView e = (TextView) v.findViewById(R.id.textView);
-        anhxa(v);
         adapter = new ReviewsAdapter(inflater.getContext(),R.layout.row_listview_reviews,arrReviews);
         listViewReviews.setAdapter(adapter);
+        txtNullReview = (TextView) v.findViewById(R.id.txtNullReview);
+        if (data.result == null){
+            txtNullReview.setVisibility(View.VISIBLE);
+            return v;}
 
-//        Intent getData = getActivity().getIntent();
-//        DetailPlace data = (DetailPlace) getData.getParcelableExtra("DataPlace");
 
+        if (data.result.reviews == null){
+            txtNullReview.setVisibility(View.VISIBLE);
+        }
+        else{
+            anhxa(v);
+        }
         return v;
     }
 
     private void anhxa(View v){
         listViewReviews = (ListView) v.findViewById(R.id.listview_reviews);
         arrReviews = new ArrayList<Reviews>();
-//        for (int i=0; i< data.result.=)
-//        arrReviews.add(new Reviews)
-//        arrReviews.add(new Menu("ATM",R.mipmap.atm));
-
+        for (int i=0; i< data.result.reviews.size(); i++){
+            arrReviews.add(new Reviews(data.result.reviews.get(i).author_name,data.result.reviews.get(i).text,data.result.reviews.get(i).relative_time_description,data.result.reviews.get(i).rating,data.result.reviews.get(i).profile_photo_url));
+        }
+    }
+    public void getData(DetailPlace data){
+        this.data = data;
     }
 }

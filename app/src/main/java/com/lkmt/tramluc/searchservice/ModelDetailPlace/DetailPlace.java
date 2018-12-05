@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.model.LatLng;
+import com.lkmt.tramluc.searchservice.ModelDirection.DetailDirection;
 
 import javax.xml.transform.Result;
 
@@ -17,6 +18,7 @@ public class DetailPlace implements Parcelable {
         //public ArrayList<Object> html_attributions;
     public ResultDetailPlace result;
     public String status = "";
+
     @Override
     public int describeContents() {
         return 0;

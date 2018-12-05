@@ -27,6 +27,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
     private String googleplaceData, url;
     private GoogleMap mMap;
     private HashMap<String, Integer> mMarkers;
+    //private HashMap<String,LatLng> mData1;
     private List<DetailPlace> mData;
     public CallBackMap callback;
     public void setCallBack(CallBackMap callback){
@@ -71,6 +72,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
     {
         mMarkers = new HashMap<String, Integer>();
         mData = new ArrayList<DetailPlace>();
+       // mData1 = new HashMap<String,LatLng>();
         Services sv;
         for (int i=0; i< nearByPlacesList.size(); i++)
         {
@@ -88,6 +90,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
 
             mData.add(getDetailPlace(place_id+"", latLng));
+          //  mData1.put(place_id,latLng);
 
             Marker marker = mMap.addMarker(markerOptions);
             mMarkers.put(marker.getId(),i);

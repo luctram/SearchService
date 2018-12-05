@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.lkmt.tramluc.searchservice.ModelMenu.Menu;
 import com.lkmt.tramluc.searchservice.R;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.PicassoProvider;
 
 import java.util.List;
 
@@ -56,10 +58,12 @@ public class ReviewsAdapter extends BaseAdapter{
 
 
         Reviews menuReviews = menuList.get(position);
-        tab_txtContentReview.setText(menuReviews.getReviewTxt());
-        tab_txtReviewName.setText(menuReviews.getAuthorName());
-        tab_txtTimeReview.setText(menuReviews.getTime());
-        rat.setRating(menuReviews.getReviewRating());
+        tab_txtContentReview.setText(menuReviews.gettext());
+        tab_txtReviewName.setText(menuReviews.getauthor_name());
+        tab_txtTimeReview.setText(menuReviews.getrelative_time_description());
+        rat.setRating(menuReviews.getrating());
+
+        Picasso.with(context).load("http://i.imgur.com/DvpvklR.png").into(imgReviewer);
 //        imgReviewer
         return convertView;
     }

@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.CallBackMap;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
+import com.lkmt.tramluc.searchservice.ModelDirection.DetailDirection;
 import com.lkmt.tramluc.searchservice.ModelDirection.DirectionsParser;
 
 import org.json.JSONException;
@@ -75,12 +76,15 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     private int Radius = 1;
     private static final int LOCATION_REQUEST =500;
     private List<Polyline> polylinePaths = new ArrayList<>(); // add line of direction
+    private List<List<HashMap<String, String>>> mRoutes = new ArrayList<>();
+    private  DirectionsParser directionsParser = new DirectionsParser();
     TextView detailName = null, detailOpenNow=null, detailKm=null,detailAddress=null; //MapsActivity
     TextView txtplaceName=null; // activityDetailPlace
     Button btnAddRadius ,btnGo, btnGoDetail, btnShowDetail;
     ImageButton btnDown;
     RatingBar rat;
     RelativeLayout detailTable;
+    public DetailDirection detailDirection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,7 +254,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getDirection(latLng, desLocation);
+                DrawRoutes(latLng,desLocation);
             }
         });
 
@@ -335,7 +339,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     public void notifyViewStatus(final DetailPlace data) {
 
         if (data == null) return;
-
         detailTable.setVisibility(View.VISIBLE); // Hien thi detail
         detailName.setText(data.result.name);
         detailAddress.setText(data.result.formatted_address);
@@ -354,8 +357,9 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
         rat.setRating(data.result.rating);
         desLocation = data.result.latLng;
+
         placeData = data;
-//        detailKm = ;
+        getDirection(latLng, desLocation);
 
 
 
@@ -373,25 +377,45 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     }
 
     public void getDirection(LatLng origin, LatLng dest){
+        String url = getRequestUrl(origin,dest);
+        TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+        taskRequestDirections.execute(url);
+    }
+    public Boolean DrawRoutes(LatLng origin, LatLng dest){
         mMap.clear();
 
         MarkerOptions markerOrigin = new MarkerOptions();
         markerOrigin.position(origin);
         markerOrigin.title("Bạn đang ở đây");
         markerOrigin.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-
         MarkerOptions markerDest = new MarkerOptions();
         markerDest.position(dest);
         markerDest.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-
         mMap.addMarker(markerOrigin);
         mMap.addMarker(markerDest);
+        if (mRoutes.isEmpty()){return false;}
+        ArrayList points = null;
+        polylinePaths = new ArrayList<>();
+        PolylineOptions polylineOptions =null;
 
+        polylinePaths.clear();
+        for (List<HashMap<String,String>> path :mRoutes){
+            points =new ArrayList();
+            polylineOptions = new PolylineOptions();
+            for (HashMap<String,String> point: path){
+                double lat = Double.parseDouble(point.get("lat"));
+                double lng = Double.parseDouble(point.get("lng"));
+                points.add(new LatLng(lat,lng));
+            }
+            polylineOptions.addAll(points);
+            polylineOptions.width(13);
+            polylineOptions.color(R.color.colorBlue);
+            polylineOptions.geodesic(true);
+        }
 
-        String url = getRequestUrl(origin,dest);
-        System.out.println(url);
-        TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
-        taskRequestDirections.execute(url);
+        polylinePaths.add(mMap.addPolyline(polylineOptions));
+        mRoutes.clear();
+        return true;
     }
 
     private String getRequestUrl(LatLng origin, LatLng dest){
@@ -400,7 +424,8 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         String sensor = "sensor=false";
         String mode = "mode=driving";
         String key = "key=AIzaSyAgfFbBLZ-XfwSwBgZ1ztkRd2R3JLq03Kc";
-        String param = str_origin +"&" +str_dest +"&" +sensor +"&" +mode +"&" +key;
+        String lang ="&language=vi";
+        String param = str_origin +"&" +str_dest +"&" +sensor +"&" +lang+"&"+mode +"&" +key;
 //        String param = str_origin +"&" +str_dest +"&" +key;
         String output ="json";
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" +param;
@@ -474,8 +499,8 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
             try{
                 jsonObject = new JSONObject(strings[0]);
-                DirectionsParser directionsParser = new DirectionsParser();
                 routes = directionsParser.parse(jsonObject);
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -485,26 +510,11 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
-            ArrayList points = null;
-            polylinePaths = new ArrayList<>();
-            PolylineOptions polylineOptions =null;
+            mRoutes = lists;
+            detailKm.setText(directionsParser.duration.getText() + " | " + directionsParser.distance.getText());
 
-            polylinePaths.clear();
-            for (List<HashMap<String,String>> path :lists){
-                points =new ArrayList();
-                polylineOptions = new PolylineOptions();
-                for (HashMap<String,String> point: path){
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
-                    points.add(new LatLng(lat,lng));
-                }
-                polylineOptions.addAll(points);
-                polylineOptions.width(13);
-                polylineOptions.color(R.color.colorBlue);
-                polylineOptions.geodesic(true);
-            }
-
-            polylinePaths.add(mMap.addPolyline(polylineOptions));
+         //   detailDirection.setDistance(directionsParser.distance.getText());
+           // detailDirection.setDuration(directionsParser.duration.getText());
         }
 
 
@@ -520,7 +530,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
 
             case "Khu du lịch": {
-                place = "amusement_park";//art_gallery, campground, museum, park, zoo
+                place = "amusement_park|art_gallery|campground|museum|zoo";
                 namePlace = "khu du lịch";
                 break;
             }
@@ -538,19 +548,19 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
 
             case "Cửa hàng tiện lợi/Tạp hóa": {
-                place = "convenience_store"; //department_store
+                place = "convenience_store|department_store";
                 namePlace ="cửa hàng tiện lợi/tạp hóa";
                 break;
             }
 
             case "Khách sạn/Nhà nghỉ": {
-                place = "hotel";
+                place = "lodging";
                 namePlace ="khách sạn/nhà nghỉ";
                 break;
             }
 
             case "Quán bar": {
-                place = "bar"; //night_club
+                place = "bar|night_club";
                 namePlace ="quán bar";
                 break;
             }

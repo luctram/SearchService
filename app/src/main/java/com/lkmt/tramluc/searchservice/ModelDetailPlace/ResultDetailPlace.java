@@ -8,6 +8,9 @@ import android.os.Parcelable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.transform.Result;
 
 
@@ -20,13 +23,13 @@ public class ResultDetailPlace implements Parcelable {
     public String website = "";
     public Opening_Hours opening_hours = null;
     public LatLng latLng = new LatLng(0,0);
+    public ArrayList<Reviews> reviews = new ArrayList<>();
 
     @Override
     public int describeContents() {
         return 0;
     }
     public ResultDetailPlace(){}
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(formatted_address);
@@ -37,6 +40,7 @@ public class ResultDetailPlace implements Parcelable {
         dest.writeParcelable(opening_hours, flags);
         dest.writeDouble(latLng.latitude);
         dest.writeDouble(latLng.longitude);
+        dest.writeTypedList(reviews);
     }
     /**
      * Retrieving Movie data from Parcel object
@@ -53,6 +57,8 @@ public class ResultDetailPlace implements Parcelable {
         Double lati = in.readDouble();
         Double longi = in.readDouble();
         this.latLng = new LatLng(lati,longi);
+        in.readTypedList(reviews,Reviews.CREATOR);
+
     }
 
     public static final Parcelable.Creator<ResultDetailPlace> CREATOR = new Parcelable.Creator<ResultDetailPlace>() {
