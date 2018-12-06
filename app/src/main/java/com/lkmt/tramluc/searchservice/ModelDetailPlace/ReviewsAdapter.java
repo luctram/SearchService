@@ -1,6 +1,8 @@
 package com.lkmt.tramluc.searchservice.ModelDetailPlace;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Rating;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,9 @@ import com.lkmt.tramluc.searchservice.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.PicassoProvider;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -63,8 +68,17 @@ public class ReviewsAdapter extends BaseAdapter{
         tab_txtTimeReview.setText(menuReviews.getrelative_time_description());
         rat.setRating(menuReviews.getrating());
 
-        Picasso.with(context).load("http://i.imgur.com/DvpvklR.png").into(imgReviewer);
-//        imgReviewer
+        URL url = null;
+        try {
+            url = new URL(menuReviews.profile_photo_url);
+            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            imgReviewer.setImageBitmap(bmp);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return convertView;
     }
 }

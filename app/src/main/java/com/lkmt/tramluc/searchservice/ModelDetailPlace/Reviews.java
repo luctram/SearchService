@@ -18,9 +18,10 @@ public class Reviews implements Parcelable {
     public Reviews(){}
     public Reviews (String author_name,String text,String relative_time_description, float rating, String profile_photo_url){
         this.author_name = author_name;
-        this.rating = rating;
         this.text = text;
         this.relative_time_description =relative_time_description;
+
+        this.rating = rating;
         this.profile_photo_url = profile_photo_url;
     }
 
