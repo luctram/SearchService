@@ -20,6 +20,7 @@ public class TabHost_DetailPlace extends Fragment {
     RatingBar rat;
     Button btnGoDetail;
     DetailPlace data;
+    String dataKm, dataHour;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,15 +46,14 @@ public class TabHost_DetailPlace extends Fragment {
         tab_txtWebsite.setText(data.result.website);
         tab_txtRating.setText(data.result.rating + "");
         rat.setRating(data.result.rating);
-        if(data.result.reviews ==null){
-            Log.d("CHECK123","Kco binh luan");
-        }else {
-            Log.d("CHECK123", data.result.reviews.get(0).getauthor_name()+"");
-        }
+//        tab_txtKm.setText(dataKm);
+//        tab_txtHour.setText(dataHour);
         return v;
     }
 
     public void getData(DetailPlace data){
        this.data = data;
     }
+    public void getDataKm(String data){this.dataKm=data;}
+    public void getDataHour(String data){this.dataHour = data;}
 }

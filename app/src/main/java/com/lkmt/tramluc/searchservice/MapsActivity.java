@@ -14,10 +14,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -79,11 +82,12 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     private List<List<HashMap<String, String>>> mRoutes = new ArrayList<>();
     private  DirectionsParser directionsParser = new DirectionsParser();
     TextView detailName = null, detailOpenNow=null, detailKm=null,detailAddress=null; //MapsActivity
-    TextView txtplaceName=null; // activityDetailPlace
-    Button btnAddRadius ,btnGo, btnGoDetail, btnShowDetail;
+    EditText txtOtherPlace;
+    Button btnIncreRadius,btnDecreRadius ,btnGo, btnGoDetail, btnShowDetail, btnOtherPlaceSearch, btnCancel, btnSearch;
     ImageButton btnDown;
     RatingBar rat;
     RelativeLayout detailTable;
+    LinearLayout layoutsearch, layoutmenu;
     public DetailDirection detailDirection;
 
     @Override
@@ -224,11 +228,18 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     }
 
     private void setUp(){
+        layoutmenu = (LinearLayout) findViewById(R.id.layoutmenu);
+        layoutsearch = (LinearLayout) findViewById(R.id.layoutsearch);
+        txtOtherPlace = (EditText) findViewById(R.id.txtOtherPlace);
+        btnOtherPlaceSearch = (Button) findViewById(R.id.btnOtherPlaceSearch);
         detailTable =(RelativeLayout) findViewById(R.id.detailTable);
-        btnAddRadius = (Button) findViewById(R.id.btnIncre);
+        btnIncreRadius = (Button) findViewById(R.id.btnIncre);
+        btnDecreRadius =(Button) findViewById(R.id.btnDecre);
         btnDown = (ImageButton) findViewById(R.id.btnDown);
         btnGo = (Button) findViewById(R.id.btnGo);
         btnGoDetail = (Button) findViewById(R.id.btnGoDetail);
+        btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnSearch = (Button) findViewById(R.id.btnSearch);
         btnShowDetail = (Button) findViewById(R.id.btnShowDetail);
         detailName = (TextView) findViewById(R.id.detail_Name);
         detailAddress = (TextView) findViewById(R.id.detail_Address);
@@ -236,18 +247,39 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         detailKm = (TextView) findViewById(R.id.detail_km);
         rat = (RatingBar) findViewById(R.id.rat);
 
-        txtplaceName = (TextView) findViewById(R.id.txtplaceName);
-
-        btnAddRadius.setOnClickListener(new View.OnClickListener() {
+        btnIncreRadius.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProximityRadius=1000;
-                Radius++;
-                ProximityRadius *= Radius;
+//                ProximityRadius=1000;
+//                Radius++;
+                ProximityRadius += 1000;
                 Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
                 Log.d("Radius",ProximityRadius+"");
                 nearPlaces(place,latitude,longitude,ProximityRadius);
 
+            }
+        });
+
+        btnDecreRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                ProximityRadius=1000;
+//                Radius--;
+                if(ProximityRadius >=2000){
+                ProximityRadius -= 1000;
+                Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
+                nearPlaces(place,latitude,longitude,ProximityRadius);}
+                else{
+                    Toast.makeText(MapsActivity.this,"Không thể giảm bán kính tìm kiếm",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layoutsearch.setVisibility(View.INVISIBLE);
+                layoutmenu.setVisibility(View.VISIBLE);
             }
         });
 
@@ -263,6 +295,8 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, ShowDetailPlaceActivity.class);
                 intent.putExtra("DataPlace",placeData);
+                intent.putExtra("dataHour",directionsParser.duration.getText());
+                intent.putExtra("dataKm",directionsParser.distance.getText());
                 startActivity(intent);
             }
         });
@@ -272,14 +306,65 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             public void onClick(View view) {
                 mMap.clear();
                 detailTable.setVisibility(View.INVISIBLE);
-                onLocationChanged(lastLocation);
+                getMarker(lastLocation);
+            }
+        });
+
+        btnOtherPlaceSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layoutmenu.setVisibility(View.INVISIBLE);
+                layoutsearch.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String otherPlace = txtOtherPlace.getText().toString();
+                Log.d("CHECK123",otherPlace);
+                getAnotherAddress(otherPlace);
+
             }
         });
     }
 
+    public void getAnotherAddress(String otherPlace){
+        List<Address> addressList =null;
+        if(TextUtils.isEmpty(otherPlace)){
+            Geocoder geocoder = new Geocoder(this);
+            Log.d("CHECK1234","OK");
+            try {
+                addressList = geocoder.getFromLocationName(otherPlace,6);
+
+                if( addressList!=null){
+                    for(int i=0; i< addressList.size(); i++){
+                        Address userAddress = addressList.get(i);
+                        LatLng latLngPlace = new LatLng(userAddress.getLatitude(),userAddress.getLongitude());
+
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latLngPlace);
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                        mMap.addMarker(markerOptions);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngPlace));
+                        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
+
+                        nearPlaces(place, latLngPlace.latitude,latLngPlace.longitude,ProximityRadius);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     @Override
     public void onLocationChanged(Location location)
     {
+        getMarker(location);
+    }
+
+    private void getMarker(Location location){
+
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
@@ -306,7 +391,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         }
         nearPlaces(place, latitude,longitude,ProximityRadius);
     }
-
 
     private void nearPlaces(String place, double lat, double lng, int ProximityRadius){
         List<Address> addressList = null;
@@ -360,20 +444,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
         placeData = data;
         getDirection(latLng, desLocation);
-
-
-
-
-        //        ta = (TextView) findViewById(R.id.detail_OpenHour);
-//        tab_txtPhone.setText(data.result.formatted_phone_number);
-//        tab_txtRating.setText(data.result.rating.toString());
-////        tab_txtHour = (TextView) findViewById(R.id.detail_hours);
-//        tab_txtAddress.setText(data.result.formatted_address);
-//        tab_txtWebsite.setText(data.result.website);
-////        tab_txtKm =
-
-
-//        txtplaceName.setText(data.result.name);
     }
 
     public void getDirection(LatLng origin, LatLng dest){
@@ -426,10 +496,8 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         String key = "key=AIzaSyAgfFbBLZ-XfwSwBgZ1ztkRd2R3JLq03Kc";
         String lang ="&language=vi";
         String param = str_origin +"&" +str_dest +"&" +sensor +"&" +lang+"&"+mode +"&" +key;
-//        String param = str_origin +"&" +str_dest +"&" +key;
         String output ="json";
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" +param;
-        Log.d("OK1234",url);
         return url;
     }
 
@@ -530,7 +598,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
 
             case "Khu du lịch": {
-                place = "amusement_park|art_gallery|campground|museum|zoo";
+                place = "amusement_park";//|art_gallery|campground|museum|zoo
                 namePlace = "khu du lịch";
                 break;
             }
@@ -548,7 +616,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
 
             case "Cửa hàng tiện lợi/Tạp hóa": {
-                place = "convenience_store|department_store";
+                place = "convenience_store"; //|department_store
                 namePlace ="cửa hàng tiện lợi/tạp hóa";
                 break;
             }
@@ -560,7 +628,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
 
             case "Quán bar": {
-                place = "bar|night_club";
+                place = "bar"; //|night_club
                 namePlace ="quán bar";
                 break;
             }

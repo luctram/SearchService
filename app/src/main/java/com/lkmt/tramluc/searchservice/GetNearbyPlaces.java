@@ -94,10 +94,8 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
             Marker marker = mMap.addMarker(markerOptions);
             mMarkers.put(marker.getId(),i);
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker){

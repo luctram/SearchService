@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.TabHost_DetailPlace;
@@ -21,6 +22,9 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
     FragmentTabHost tabhost;
     DetailPlace data;
     Intent reviewIntent,detailIntent;
+    TextView txtplaceName;
+    String dataKm, dataHour;
+
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -37,6 +41,11 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
 //
         Intent getData = getIntent();
         data = (DetailPlace) getData.getParcelableExtra("DataPlace");
+        dataHour = getData.getStringExtra("dataHour");
+        dataKm = getData.getStringExtra("dataKm");
+
+        txtplaceName = findViewById(R.id.txtplaceName);
+        txtplaceName.setText(data.result.name);
     }
 
     @Override
@@ -46,6 +55,11 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
         if (fragment.getClass() == TabHost_DetailPlace.class) {
             TabHost_DetailPlace detailPlace = (TabHost_DetailPlace) fragment;
             detailPlace.getData(data);
+
+            TabHost_DetailPlace dataKm = (TabHost_DetailPlace) fragment;
+//            dataKm.getDataKm(dataKm);
+//
+
 
         }
 
