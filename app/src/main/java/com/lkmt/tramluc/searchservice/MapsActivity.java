@@ -28,9 +28,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -59,7 +63,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsActivity extends FragmentActivity implements PlaceSelectionListener, CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
 
@@ -82,12 +86,11 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     private List<List<HashMap<String, String>>> mRoutes = new ArrayList<>();
     private  DirectionsParser directionsParser = new DirectionsParser();
     TextView detailName = null, detailOpenNow=null, detailKm=null,detailAddress=null; //MapsActivity
-    EditText txtOtherPlace;
-    Button btnIncreRadius,btnDecreRadius ,btnGo, btnGoDetail, btnShowDetail, btnOtherPlaceSearch, btnCancel, btnSearch;
+    Button btnIncreRadius,btnDecreRadius ,btnGo, btnGoDetail, btnShowDetail, btnOtherPlaceSearch;
     ImageButton btnDown;
     RatingBar rat;
     RelativeLayout detailTable;
-    LinearLayout layoutsearch, layoutmenu;
+    LinearLayout layoutmenu;
     public DetailDirection detailDirection;
 
     @Override
@@ -105,6 +108,12 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.myMap);
         mapFragment.getMapAsync(this);
+
+        PlaceAutocompleteFragment autocompleteFragment =
+                (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(
+                        R.id.place_autocomplete_fragment);
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+
         Intent intent = getIntent();
         serviceName = intent.getStringExtra("NameService");
         serviceName1 = (TextView) findViewById(R.id.txtplaceName);
@@ -229,8 +238,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
     private void setUp(){
         layoutmenu = (LinearLayout) findViewById(R.id.layoutmenu);
-        layoutsearch = (LinearLayout) findViewById(R.id.layoutsearch);
-        txtOtherPlace = (EditText) findViewById(R.id.txtOtherPlace);
         btnOtherPlaceSearch = (Button) findViewById(R.id.btnOtherPlaceSearch);
         detailTable =(RelativeLayout) findViewById(R.id.detailTable);
         btnIncreRadius = (Button) findViewById(R.id.btnIncre);
@@ -238,8 +245,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         btnDown = (ImageButton) findViewById(R.id.btnDown);
         btnGo = (Button) findViewById(R.id.btnGo);
         btnGoDetail = (Button) findViewById(R.id.btnGoDetail);
-        btnCancel = (Button) findViewById(R.id.btnCancel);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
         btnShowDetail = (Button) findViewById(R.id.btnShowDetail);
         detailName = (TextView) findViewById(R.id.detail_Name);
         detailAddress = (TextView) findViewById(R.id.detail_Address);
@@ -275,14 +280,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
         });
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                layoutsearch.setVisibility(View.INVISIBLE);
-                layoutmenu.setVisibility(View.VISIBLE);
-            }
-        });
-
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -314,49 +311,42 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             @Override
             public void onClick(View view) {
                 layoutmenu.setVisibility(View.INVISIBLE);
-                layoutsearch.setVisibility(View.VISIBLE);
             }
         });
 
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String otherPlace = txtOtherPlace.getText().toString();
-                Log.d("CHECK123",otherPlace);
-                getAnotherAddress(otherPlace);
-
-            }
-        });
     }
 
-    public void getAnotherAddress(String otherPlace){
-        List<Address> addressList =null;
-        if(TextUtils.isEmpty(otherPlace)){
-            Geocoder geocoder = new Geocoder(this);
-            Log.d("CHECK1234","OK");
-            try {
-                addressList = geocoder.getFromLocationName(otherPlace,6);
-
-                if( addressList!=null){
-                    for(int i=0; i< addressList.size(); i++){
-                        Address userAddress = addressList.get(i);
-                        LatLng latLngPlace = new LatLng(userAddress.getLatitude(),userAddress.getLongitude());
-
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLngPlace);
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                        mMap.addMarker(markerOptions);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngPlace));
-                        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
-
-                        nearPlaces(place, latLngPlace.latitude,latLngPlace.longitude,ProximityRadius);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void getAnotherAddress(String otherPlace){
+//        List<Address> addressList =null;
+//        if(otherPlace.trim() != ""){
+//            Geocoder geocoder = new Geocoder(this);
+//
+//            try {
+//                addressList = geocoder.getFromLocationName(otherPlace,1);
+//
+//                Log.d("CHECK123", addressList.size() +"");
+//                if(addressList.size() == 0){
+//                    addressList = geocoder.getFromLocationName(otherPlace,1);
+//                }
+//                if (addressList.size() >0){
+//                    Address add = addressList.get(0);
+//                    Log.d("CHECK1234", add.getLatitude() + "  " + add.getLongitude());
+//                    LatLng latLngPlace = new LatLng(add.getLatitude(),add.getLongitude());
+//                    MarkerOptions markerOptions = new MarkerOptions();
+//                        markerOptions.position(latLngPlace);
+//                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+//                        mMap.addMarker(markerOptions);
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngPlace));
+//                        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
+//
+//                    nearPlaces(place, latLngPlace.latitude,latLngPlace.longitude,ProximityRadius);
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
     @Override
     public void onLocationChanged(Location location)
     {
@@ -533,6 +523,26 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             httpURLConnection.disconnect();
         }
         return responseString;
+    }
+
+    @Override
+    public void onPlaceSelected(Place place1) {
+        mMap.clear();
+        LatLng latLngPlace = place1.getLatLng();
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLngPlace);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        mMap.addMarker(markerOptions);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngPlace));
+        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
+
+        nearPlaces(place, place1.getLatLng().latitude,place1.getLatLng().longitude,ProximityRadius);
+    }
+
+    @Override
+    public void onError(Status status) {
+
     }
 
     public class TaskRequestDirections extends AsyncTask<String,Void,String> {
