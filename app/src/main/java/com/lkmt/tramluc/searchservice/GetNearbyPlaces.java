@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.CallBackMap;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.LatLngg;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -119,6 +120,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
         try {
             data = mapper.readValue(new URL(url), DetailPlace.class);
+            data.result.latLng = new LatLngg();
             data.result.latLng.setLatLng(latLng);
         }
         catch (MalformedURLException err){

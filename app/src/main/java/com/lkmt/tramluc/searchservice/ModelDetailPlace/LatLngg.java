@@ -1,7 +1,5 @@
 package com.lkmt.tramluc.searchservice.ModelDetailPlace;
 
-import android.os.Parcelable;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import io.realm.RealmObject;

@@ -1,6 +1,8 @@
 package com.lkmt.tramluc.searchservice;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -9,9 +11,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.ResultDetailPlace;
 import com.lkmt.tramluc.searchservice.ModelMenu.Menu;
 import com.lkmt.tramluc.searchservice.ModelMenu.MenuAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -22,6 +27,7 @@ import com.lkmt.tramluc.searchservice.Realm.TypeServiceDB;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class MainActivity extends AppCompatActivity {
     private GoogleMap mMap;
@@ -29,16 +35,25 @@ public class MainActivity extends AppCompatActivity {
     ListView listViewmenu;
     ArrayList<Menu> arrMenu;
     MenuAdapter adapter;
+    Button btnUpdate;
     Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().name("myrealm.realm").build();
+        Realm.setDefaultConfiguration(config);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        ServicesDB.getDetailPlaceFromFireBase();
-//        String[] listCities = new String[]{"Thành phố Hồ Chí Minh","Hà Nội","Nha Trang","Vũng Tàu","Phan Thiết","Đà Lạt","Cần Thơ", "Đà Nẵng","Sa Pa"};
+
+        btnUpdate = (Button) findViewById(R.id.btnUpdate);
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //        String[] listCities = new String[]{"Thành phố Hồ Chí Minh","Hà Nội","Nha Trang","Vũng Tàu","Phan Thiết","Đà Lạt","Cần Thơ", "Đà Nẵng","Sa Pa"};
 
 ////
 ////        for(int i=0; i< listCities.length; i++){
@@ -76,7 +91,34 @@ public class MainActivity extends AppCompatActivity {
 //
 //        listServices = new TypeServices("gas_station","Trạm xăng");
 //        mData.child("TypeServices").push().setValue(listServices);
-//
+
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+            builder1.setMessage("Quá trình cập nhập dữ liệu sẽ tốn vài phút. Bạn có muốn cập nhập không?");
+            builder1.setCancelable(true);
+
+            builder1.setPositiveButton(
+                    "Có",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ServicesDB service = new ServicesDB();
+                            service.addToRealm();
+                        }
+                    });
+
+            builder1.setNegativeButton(
+                    "Không",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+
+            }
+        });
+
 
         anhxa();
         adapter = new MenuAdapter(this,R.layout.row_listview_menu,arrMenu);
@@ -90,24 +132,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    public boolean onCreateOptionMenu(android.view.Menu tabMenu){
-        getMenuInflater().inflate(R.menu.menu, tabMenu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        int i = item.getItemId();
-        switch (i){
-            case R.id.Update:
-                Log.d("Check123","OK update");
-                break;
-
-        }
-
-        return true;
     }
 
     private void anhxa(){
@@ -126,29 +150,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-//    private  void nearPlaces(String place, double lat, double lng){
-//        List<Address> addressList = null;
-//        MarkerOptions userMarkerOptions = new MarkerOptions();
-//        Geocoder geocoder = new Geocoder(this);
-//        Object transferData[] = new Object[2];
-//        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-//
-//        String url = getUrl(lat, lng, place);
-//        transferData[0] = mMap;
-//        transferData[1] = url;
-//        getNearbyPlaces.execute(transferData);
-//        Toast.makeText(this, "Đang tìm " , Toast.LENGTH_SHORT).show();
-//        Log.d("1234",url);
-//    }
-//
-//    private String getUrl(double latitide, double longitude, String nearbyPlace)
-//    {
-//        StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-//        googleURL.append("location=" + latitide + "," + longitude);
-//        googleURL.append("&radius=" + 1000);
-//        googleURL.append("&types=" + nearbyPlace);
-//        googleURL.append("&key="+"AIzaSyA9Vf8Gc0CbgzzbjGltlxTuzNxz7PV26zw");
-//
-//        return googleURL.toString();
-//    }
 }

@@ -9,55 +9,56 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmObject;
 
 
 @JsonIgnoreProperties
-public class ResultDetailPlace implements Parcelable {
+public class ResultDetailPlaceRealm extends RealmObject implements Parcelable {
     public String formatted_address;
     public String formatted_phone_number;
     public String name;
     public Float rating;
     public String website;
-    public Opening_Hours opening_hours;
+    public Opening_HoursRealm opening_hours;
     public LatLngg latLng;
-    public ArrayList<Reviews> reviews;
+    public RealmList<Reviews> reviews;
     public String type;
 
-    private ArrayList<String> castToArrayListString(RealmList<String> list){
-       ArrayList<String> a = new ArrayList<>();
+    private RealmList<String> castToArrayListString(ArrayList<String> list){
+        RealmList<String> a = new RealmList<>();
         for (String item: list) {
             a.add(item);
         }
         return a;
     }
-    private void castToArrayListReviews(RealmList<Reviews> list){
+    private  void castToArrayListReviews(ArrayList<Reviews> list){
         if (list == null) return;
-        reviews = new ArrayList<Reviews>();
         for (Reviews item:list){
             reviews.add(item);
         }
     }
-    public void setDataFromRealm(ResultDetailPlaceRealm data){
-        Realm realm = Realm.getDefaultInstance();
+
+    public void setData(ResultDetailPlace data, Realm realm){
         formatted_address = data.formatted_address;
         formatted_phone_number = data.formatted_phone_number;
         name = data.name;
         rating = data.rating;
         website = data.website;
         if (data.opening_hours != null) {
-            opening_hours = new Opening_Hours();
+            opening_hours = realm.createObject(Opening_HoursRealm.class);
             opening_hours.open_now = data.opening_hours.open_now;
             opening_hours.weekday_text = castToArrayListString(data.opening_hours.weekday_text);
         }
-        latLng = data.latLng;
+        latLng = realm.copyToRealm(data.latLng);
         castToArrayListReviews(data.reviews);
         type = data.type;
     }
+
     @Override
     public int describeContents() {
         return 0;
     }
-    public ResultDetailPlace(){}
+    public ResultDetailPlaceRealm(){}
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(formatted_address);
@@ -76,7 +77,7 @@ public class ResultDetailPlace implements Parcelable {
      * This constructor is invoked by the method createFromParcel(Parcel source) of
      * the object CREATOR
      **/
-    private ResultDetailPlace(Parcel in){
+    private ResultDetailPlaceRealm(Parcel in){
         this.formatted_address = in.readString();
         this.formatted_phone_number = in.readString();
         this.name = in.readString();
@@ -91,15 +92,15 @@ public class ResultDetailPlace implements Parcelable {
 
     }
 
-    public static final Parcelable.Creator<ResultDetailPlace> CREATOR = new Parcelable.Creator<ResultDetailPlace>() {
+    public static final Parcelable.Creator<ResultDetailPlaceRealm> CREATOR = new Parcelable.Creator<ResultDetailPlaceRealm>() {
         @Override
-        public ResultDetailPlace createFromParcel(Parcel source) {
-            return new ResultDetailPlace(source);
+        public ResultDetailPlaceRealm createFromParcel(Parcel source) {
+            return new ResultDetailPlaceRealm(source);
         }
 
         @Override
-        public ResultDetailPlace[] newArray(int size) {
-            return new ResultDetailPlace[size];
+        public ResultDetailPlaceRealm[] newArray(int size) {
+            return new ResultDetailPlaceRealm[size];
         }
     };
 }

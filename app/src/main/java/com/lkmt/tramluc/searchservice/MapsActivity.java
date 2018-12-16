@@ -1,6 +1,8 @@
 package com.lkmt.tramluc.searchservice;
 
 import android.Manifest;
+import android.app.Fragment;
+import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -47,8 +49,10 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.CallBackMap;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.ResultDetailPlace;
 import com.lkmt.tramluc.searchservice.ModelDirection.DetailDirection;
 import com.lkmt.tramluc.searchservice.ModelDirection.DirectionsParser;
+import com.lkmt.tramluc.searchservice.Realm.ServicesDB;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,6 +66,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import io.realm.Realm;
+
+import static com.lkmt.tramluc.searchservice.Realm.ServicesDB.getDetailPlaceFromFireBase;
 
 public class MapsActivity extends FragmentActivity implements PlaceSelectionListener, CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -91,13 +99,17 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     RatingBar rat;
     RelativeLayout detailTable;
     LinearLayout layoutmenu;
+    PlaceAutocompleteFragment autocompleteFragment;
+
     public DetailDirection detailDirection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        setUp();
+
+
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
@@ -109,10 +121,11 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
                 .findFragmentById(R.id.myMap);
         mapFragment.getMapAsync(this);
 
-        PlaceAutocompleteFragment autocompleteFragment =
-                (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(
-                        R.id.place_autocomplete_fragment);
+        autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(this);
+        autocompleteFragment.getView().setVisibility(View.INVISIBLE);
+
+        setUp();
 
         Intent intent = getIntent();
         serviceName = intent.getStringExtra("NameService");
@@ -255,8 +268,6 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         btnIncreRadius.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                ProximityRadius=1000;
-//                Radius++;
                 ProximityRadius += 1000;
                 Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
                 Log.d("Radius",ProximityRadius+"");
@@ -268,8 +279,6 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         btnDecreRadius.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                ProximityRadius=1000;
-//                Radius--;
                 if(ProximityRadius >=2000){
                 ProximityRadius -= 1000;
                 Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
@@ -311,6 +320,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
             @Override
             public void onClick(View view) {
                 layoutmenu.setVisibility(View.INVISIBLE);
+                autocompleteFragment.getView().setVisibility(View.VISIBLE);
             }
         });
 
@@ -351,6 +361,8 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     public void onLocationChanged(Location location)
     {
         getMarker(location);
+        Realm realm = Realm.getDefaultInstance();
+        ArrayList<ResultDetailPlace> list = ServicesDB.getDetailPlace(new LatLng(location.getLatitude(),location.getLongitude()),"restaurant", 2.0, realm);
     }
 
     private void getMarker(Location location){

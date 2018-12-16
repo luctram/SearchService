@@ -4,22 +4,21 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.lang.String;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.realm.RealmList;
 import io.realm.RealmObject;
 
 @JsonIgnoreProperties
-public class Opening_Hours implements Parcelable {
+public class Opening_HoursRealm extends RealmObject implements Parcelable {
     public Boolean open_now = false;
-    public ArrayList<String> weekday_text = new ArrayList<>();
+    public RealmList<String> weekday_text = new RealmList<>();
 
     @Override
     public int describeContents() {
         return 0;
     }
-    public Opening_Hours(){}
+    public Opening_HoursRealm(){}
 
     // Storing the Movie data to Parcel object
     @Override
@@ -34,20 +33,20 @@ public class Opening_Hours implements Parcelable {
      * This constructor is invoked by the method createFromParcel(Parcel source) of
      * the object CREATOR
      **/
-    private Opening_Hours(Parcel in){
+    private Opening_HoursRealm(Parcel in){
         this.open_now = in.readByte() != 0;
         in.readStringList(weekday_text);
     }
 
-    public static final Parcelable.Creator<Opening_Hours> CREATOR = new Parcelable.Creator<Opening_Hours>() {
+    public static final Parcelable.Creator<Opening_HoursRealm> CREATOR = new Parcelable.Creator<Opening_HoursRealm>() {
         @Override
-        public Opening_Hours createFromParcel(Parcel source) {
-            return new Opening_Hours(source);
+        public Opening_HoursRealm createFromParcel(Parcel source) {
+            return new Opening_HoursRealm(source);
         }
 
         @Override
-        public Opening_Hours[] newArray(int size) {
-            return new Opening_Hours[size];
+        public Opening_HoursRealm[] newArray(int size) {
+            return new Opening_HoursRealm[size];
         }
     };
 }

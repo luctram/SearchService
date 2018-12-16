@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="120" />
+                                                <entry key="scalingPercent" value="0" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -34,8 +34,8 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="7f8381" />
-                                                <entry key="scalingPercent" value="58" />
+                                                <entry key="color" value="191b1a" />
+                                                <entry key="scalingPercent" value="104" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -46,7 +46,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_cancel_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_update_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -56,12 +56,12 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="f9f9f9" />
-                                      <entry key="backgroundLayerName" value="ic_cancel1" />
+                                      <entry key="backgroundImage" value="C:\Program Files\Android\Android Studio\plugins\android\lib\templates\gradle-projects\NewAndroidModule\root\res\ic_launcher-web.png" />
+                                      <entry key="backgroundLayerName" value="icon_updatemaps2" />
                                       <entry key="foregroundAssetType" value="CLIP_ART" />
-                                      <entry key="foregroundLayerName" value="icon_cancel1" />
-                                      <entry key="outputName" value="icon_cancel" />
+                                      <entry key="foregroundLayerName" value="icon_updatemaps1" />
+                                      <entry key="outputName" value="icon_updatemaps" />
                                     </map>
                                   </option>
                                 </PersistentState>
