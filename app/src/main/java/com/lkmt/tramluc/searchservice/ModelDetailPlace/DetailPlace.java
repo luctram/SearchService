@@ -12,9 +12,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.lkmt.tramluc.searchservice.ModelDirection.DetailDirection;
 
 import javax.xml.transform.Result;
+import io.realm.Realm;
+import io.realm.RealmObject;
 
 @JsonIgnoreProperties
-public class DetailPlace implements Parcelable {
+public class DetailPlace implements Parcelable  {
         //public ArrayList<Object> html_attributions;
     public ResultDetailPlace result;
     public String status = "";

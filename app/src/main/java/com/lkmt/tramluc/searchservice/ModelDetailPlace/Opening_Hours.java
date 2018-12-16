@@ -4,14 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.lang.String;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
 @JsonIgnoreProperties
-public class Opening_Hours implements Parcelable {
+public class Opening_Hours extends RealmObject implements Parcelable {
     public Boolean open_now = false;
-    public ArrayList<String> weekday_text = new ArrayList<>();
+    public RealmList<String> weekday_text = new RealmList<>();
 
     @Override
     public int describeContents() {

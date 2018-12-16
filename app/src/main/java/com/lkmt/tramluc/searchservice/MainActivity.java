@@ -1,5 +1,6 @@
 package com.lkmt.tramluc.searchservice;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -15,11 +16,12 @@ import com.lkmt.tramluc.searchservice.ModelMenu.Menu;
 import com.lkmt.tramluc.searchservice.ModelMenu.MenuAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-//import com.lkmt.tramluc.searchservice.Realm.TypeServiceDB;
+import com.lkmt.tramluc.searchservice.Realm.ServicesDB;
+import com.lkmt.tramluc.searchservice.Realm.TypeServiceDB;
 
 import java.util.ArrayList;
 
-//import io.realm.Realm;
+import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
     private GoogleMap mMap;
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listViewmenu;
     ArrayList<Menu> arrMenu;
     MenuAdapter adapter;
-
+    Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,25 +37,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
-//        Realm realm;
-//       // realm.init(this);
-//
-//        realm = Realm.getDefaultInstance(); // create for read, write
-
-//        realm.beginTransaction(); //open DB
-//        TypeServiceDB typeServiceDB = realm.createObject(TypeServiceDB.class);
-//        typeServiceDB.setTypeServiceName();
-//        typeServiceDB.setTypeService();
-//        typeServiceDB.setTypeServiceId();
-//
-//        realm.commitTransaction(); // close db
-//        finish();
-
-
+        ServicesDB.getDetailPlaceFromFireBase();
 //        String[] listCities = new String[]{"Thành phố Hồ Chí Minh","Hà Nội","Nha Trang","Vũng Tàu","Phan Thiết","Đà Lạt","Cần Thơ", "Đà Nẵng","Sa Pa"};
 
-        mData = FirebaseDatabase.getInstance().getReference();
 ////
 ////        for(int i=0; i< listCities.length; i++){
 ////            mData.child("cities").push().setValue(listCities[i]);

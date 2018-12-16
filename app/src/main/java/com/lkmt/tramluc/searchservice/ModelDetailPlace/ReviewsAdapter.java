@@ -63,10 +63,10 @@ public class ReviewsAdapter extends BaseAdapter{
 
 
         Reviews menuReviews = menuList.get(position);
-        tab_txtContentReview.setText(menuReviews.gettext());
-        tab_txtReviewName.setText(menuReviews.getauthor_name());
-        tab_txtTimeReview.setText(menuReviews.getrelative_time_description());
-        rat.setRating(menuReviews.getrating());
+        tab_txtContentReview.setText(menuReviews.getText());
+        tab_txtReviewName.setText(menuReviews.getAuthor_name());
+        tab_txtTimeReview.setText(menuReviews.getRelative_time_description());
+        rat.setRating(menuReviews.getRating());
 
         URL url = null;
         try {

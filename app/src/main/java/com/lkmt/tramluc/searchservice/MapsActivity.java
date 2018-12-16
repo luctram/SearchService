@@ -430,7 +430,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         }
 
         rat.setRating(data.result.rating);
-        desLocation = data.result.latLng;
+        desLocation = data.result.latLng.getLatLng();
 
         placeData = data;
         getDirection(latLng, desLocation);

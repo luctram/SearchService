@@ -13,17 +13,21 @@ import java.util.List;
 
 import javax.xml.transform.Result;
 
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
 
 @JsonIgnoreProperties
-public class ResultDetailPlace implements Parcelable {
-    public String formatted_address = "";
-    public String formatted_phone_number = "";
-    public String name = "";
-    public float rating = 0;
-    public String website = "";
-    public Opening_Hours opening_hours = null;
-    public LatLng latLng = new LatLng(0,0);
-    public ArrayList<Reviews> reviews = new ArrayList<>();
+public class ResultDetailPlace extends RealmObject implements Parcelable {
+    public String formatted_address;
+    public String formatted_phone_number;
+    public String name;
+    public Float rating;
+    public String website;
+    public Opening_Hours opening_hours;
+    public LatLngg latLng;
+    public RealmList<Reviews> reviews;
+    public String type;
 
     @Override
     public int describeContents() {
@@ -41,6 +45,7 @@ public class ResultDetailPlace implements Parcelable {
         dest.writeDouble(latLng.latitude);
         dest.writeDouble(latLng.longitude);
         dest.writeTypedList(reviews);
+        dest.writeString(type);
     }
     /**
      * Retrieving Movie data from Parcel object
@@ -56,8 +61,9 @@ public class ResultDetailPlace implements Parcelable {
         this.opening_hours = in.readParcelable(Opening_Hours.class.getClassLoader());
         Double lati = in.readDouble();
         Double longi = in.readDouble();
-        this.latLng = new LatLng(lati,longi);
+        this.latLng = new LatLngg(lati,longi);
         in.readTypedList(reviews,Reviews.CREATOR);
+        this.type = in.readString();
 
     }
 

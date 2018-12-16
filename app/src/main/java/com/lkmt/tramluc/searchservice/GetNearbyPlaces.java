@@ -119,7 +119,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
         try {
             data = mapper.readValue(new URL(url), DetailPlace.class);
-            data.result.latLng = latLng;
+            data.result.latLng.setLatLng(latLng);
         }
         catch (MalformedURLException err){
             Log.d("ChecckERR", err.getMessage()+"");

@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
 
+import io.realm.RealmObject;
+
 @JsonIgnoreProperties
-public class Reviews implements Parcelable {
+public class Reviews extends RealmObject implements Parcelable {
     public String author_name = "";
     public String text = "";
     public String relative_time_description = "";
@@ -16,7 +18,48 @@ public class Reviews implements Parcelable {
     public String profile_photo_url = "";
 
     public Reviews(){}
-    public Reviews (String author_name,String text,String relative_time_description, float rating, String profile_photo_url){
+
+    public String getAuthor_name() {
+        return author_name;
+    }
+
+    public void setAuthor_name(String author_name) {
+        this.author_name = author_name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getRelative_time_description() {
+        return relative_time_description;
+    }
+
+    public void setRelative_time_description(String relative_time_description) {
+        this.relative_time_description = relative_time_description;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public String getProfile_photo_url() {
+        return profile_photo_url;
+    }
+
+    public void setProfile_photo_url(String profile_photo_url) {
+        this.profile_photo_url = profile_photo_url;
+    }
+
+    public Reviews (String author_name, String text, String relative_time_description, float rating, String profile_photo_url){
         this.author_name = author_name;
         this.text = text;
         this.relative_time_description =relative_time_description;
@@ -25,43 +68,6 @@ public class Reviews implements Parcelable {
         this.profile_photo_url = profile_photo_url;
     }
 
-    public String getauthor_name(){return author_name;}
-
-    public void setauthor_name(String author_name){
-        this.author_name = author_name;
-    }
-
-    public String gettext() {
-        return text;
-    }
-
-    public void settext(String text) {
-        this.text = text;
-    }
-
-    public String getrelative_time_description() {
-        return relative_time_description;
-    }
-
-    public void setrelative_time_description(String relative_time_description) {
-        this.relative_time_description = relative_time_description;
-    }
-
-    public String getprofile_photo_url() {
-        return profile_photo_url;
-    }
-
-    public void setprofile_photo_url(String profile_photo_url) {
-        this.profile_photo_url = profile_photo_url;
-    }
-
-    public float getrating() {
-        return rating;
-    }
-
-    public void setrating(float rating) {
-        this.rating = rating;
-    }
 
     @Override
     public int describeContents() {
