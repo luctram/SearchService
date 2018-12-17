@@ -13,7 +13,7 @@ import io.realm.RealmObject;
 
 
 @JsonIgnoreProperties
-public class ResultDetailPlaceRealm extends RealmObject implements Parcelable {
+public class ResultDetailPlaceRealm extends RealmObject {
     public String formatted_address;
     public String formatted_phone_number;
     public String name;
@@ -54,54 +54,5 @@ public class ResultDetailPlaceRealm extends RealmObject implements Parcelable {
         type = data.type;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-    public ResultDetailPlaceRealm(){}
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(formatted_address);
-        dest.writeString(formatted_phone_number);
-        dest.writeString(name);
-        dest.writeFloat(rating);
-        dest.writeString(website);
-        dest.writeParcelable(opening_hours, flags);
-        dest.writeDouble(latLng.latitude);
-        dest.writeDouble(latLng.longitude);
-        dest.writeTypedList(reviews);
-        dest.writeString(type);
-    }
-    /**
-     * Retrieving Movie data from Parcel object
-     * This constructor is invoked by the method createFromParcel(Parcel source) of
-     * the object CREATOR
-     **/
-    private ResultDetailPlaceRealm(Parcel in){
-        this.formatted_address = in.readString();
-        this.formatted_phone_number = in.readString();
-        this.name = in.readString();
-        this.rating = in.readFloat();
-        this.website = in.readString();
-        this.opening_hours = in.readParcelable(Opening_Hours.class.getClassLoader());
-        Double lati = in.readDouble();
-        Double longi = in.readDouble();
-        this.latLng = new LatLngg(lati,longi);
-        in.readTypedList(reviews,Reviews.CREATOR);
-        this.type = in.readString();
-
-    }
-
-    public static final Parcelable.Creator<ResultDetailPlaceRealm> CREATOR = new Parcelable.Creator<ResultDetailPlaceRealm>() {
-        @Override
-        public ResultDetailPlaceRealm createFromParcel(Parcel source) {
-            return new ResultDetailPlaceRealm(source);
-        }
-
-        @Override
-        public ResultDetailPlaceRealm[] newArray(int size) {
-            return new ResultDetailPlaceRealm[size];
-        }
-    };
 }
 

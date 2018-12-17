@@ -19,6 +19,14 @@ public class Reviews extends RealmObject implements Parcelable {
 
     public Reviews(){}
 
+    public Reviews(String author_name, String text, String relative_time_description, float rating, String profile_photo_url) {
+        this.author_name = author_name;
+        this.text = text;
+        this.relative_time_description = relative_time_description;
+        this.rating = rating;
+        this.profile_photo_url = profile_photo_url;
+    }
+
     public String getAuthor_name() {
         return author_name;
     }
@@ -59,13 +67,13 @@ public class Reviews extends RealmObject implements Parcelable {
         this.profile_photo_url = profile_photo_url;
     }
 
-    public Reviews (String author_name, String text, String relative_time_description, float rating, String profile_photo_url){
-        this.author_name = author_name;
-        this.text = text;
-        this.relative_time_description =relative_time_description;
+    public Reviews (Reviews reviews){
+        this.author_name = reviews.author_name;
+        this.text = reviews.text;
+        this.relative_time_description = reviews.relative_time_description;
 
-        this.rating = rating;
-        this.profile_photo_url = profile_photo_url;
+        this.rating = reviews.rating;
+        this.profile_photo_url = reviews.profile_photo_url;
     }
 
 

@@ -63,12 +63,10 @@ public class TabHost_Reviews extends Fragment {
         for (int i=0; i< data.result.reviews.size(); i++){
 
             arrReviews.add(new Reviews(data.result.reviews.get(i).author_name,data.result.reviews.get(i).relative_time_description,data.result.reviews.get(i).profile_photo_url,data.result.reviews.get(i).rating,data.result.reviews.get(i).text));
-            Log.d("Check123","OK");
-        }
-        Log.d("Check123","OKFINE");
 
-        Log.d("Check123",(data.result.reviews.get(0).author_name+" + "+data.result.reviews.get(0).text+" + "+data.result.reviews.get(0).relative_time_description+" + "+data.result.reviews.get(0).rating+" + "+data.result.reviews.get(0).profile_photo_url));
-    }
+        }
+
+   }
     public void getData(DetailPlace data){
         this.data = data;
     }

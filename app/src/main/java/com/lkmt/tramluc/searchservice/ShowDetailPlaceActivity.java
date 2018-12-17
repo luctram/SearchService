@@ -45,7 +45,7 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
         dataKm = getData.getStringExtra("dataKm");
 
         txtplaceName = findViewById(R.id.txtplaceName);
-        txtplaceName.setText(data.result.name);
+        txtplaceName.setText(new String(data.result.name));
     }
 
     @Override

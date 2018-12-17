@@ -41,8 +41,8 @@ public class TabHost_DetailPlace extends Fragment {
         rat = (RatingBar) v.findViewById(R.id.rat);
         if (data.result == null){
             return v;}
-        tab_txtAddress.setText(data.result.formatted_address);
-        tab_txtPhone.setText(data.result.formatted_phone_number);
+        tab_txtAddress.setText(new String(data.result.formatted_address));
+        tab_txtPhone.setText(new String(data.result.formatted_phone_number));
         tab_txtWebsite.setText(data.result.website);
         tab_txtRating.setText(data.result.rating + "");
         rat.setRating(data.result.rating);

@@ -28,18 +28,20 @@ public class ServicesDB {
         RealmResults<ResultDetailPlaceRealm> result = realm.where(ResultDetailPlaceRealm.class).equalTo("type",type).findAll();
         ArrayList<ResultDetailPlace> finalResult = new ArrayList<>();
         for (ResultDetailPlaceRealm element:result) {
-            ResultDetailPlace item = new ResultDetailPlace();
-            double x = currentPo.latitude;
-            double y = currentPo.longitude;
-            double xx = element.latLng.latitude;
-            double yy = element.latLng.longitude;
-            double xxx = (x - xx)*(x-xx);
-            double yyy = (y - yy)*(y-yy);
-            double delta = Math.sqrt(xxx+yyy);
-            System.out.println(delta);
-            if (delta*100 <= r){
-                item.setDataFromRealm(element);
-                finalResult.add(item);
+            if (element.latLng != null) {
+                ResultDetailPlace item = new ResultDetailPlace();
+                double x = currentPo.latitude;
+                double y = currentPo.longitude;
+                double xx = element.latLng.latitude;
+                double yy = element.latLng.longitude;
+                double xxx = (x - xx) * (x - xx);
+                double yyy = (y - yy) * (y - yy);
+                double delta = Math.sqrt(xxx + yyy);
+                System.out.println(delta);
+                if (delta * 100 <= r) {
+                    item.setDataFromRealm(element);
+                    finalResult.add(item);
+                }
             }
         }
         return finalResult;

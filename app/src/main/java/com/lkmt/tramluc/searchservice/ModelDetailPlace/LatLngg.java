@@ -7,9 +7,9 @@ import io.realm.RealmObject;
 public class LatLngg extends RealmObject {
     public Double latitude;
     public Double longitude;
-    public LatLngg(Double latitude, Double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public LatLngg(LatLngg latlng) {
+        this.latitude = latlng.latitude;
+        this.longitude = latlng.longitude;
     }
     public void setLatLng(LatLng latlng){
         this.latitude = latlng.latitude;

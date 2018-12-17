@@ -3,11 +3,13 @@ package com.lkmt.tramluc.searchservice;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -27,6 +29,7 @@ import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,6 +40,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -71,7 +75,7 @@ import io.realm.Realm;
 
 import static com.lkmt.tramluc.searchservice.Realm.ServicesDB.getDetailPlaceFromFireBase;
 
-public class MapsActivity extends FragmentActivity implements PlaceSelectionListener, CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLongClickListener, PlaceSelectionListener, CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
 
@@ -80,11 +84,12 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
-    private Location lastLocation;
+    private LatLng lastLocation;
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
     private double latitude, longitude;
     private LatLng latLng;
+    private Boolean directing = false;
     private LatLng desLocation;
     private DetailPlace placeData;
     private int ProximityRadius = 1000;
@@ -93,12 +98,15 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     private List<Polyline> polylinePaths = new ArrayList<>(); // add line of direction
     private List<List<HashMap<String, String>>> mRoutes = new ArrayList<>();
     private  DirectionsParser directionsParser = new DirectionsParser();
+    private ArrayList<MarkerOptions> listMarkers;
     TextView detailName = null, detailOpenNow=null, detailKm=null,detailAddress=null; //MapsActivity
     Button btnIncreRadius,btnDecreRadius ,btnGo, btnGoDetail, btnShowDetail, btnOtherPlaceSearch;
-    ImageButton btnDown;
+    Button btnDown;
     RatingBar rat;
     RelativeLayout detailTable;
     LinearLayout layoutmenu;
+    ToggleButton toggleButton;
+    Boolean toggle = false;
     PlaceAutocompleteFragment autocompleteFragment;
 
     public DetailDirection detailDirection;
@@ -144,7 +152,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             buildGoogleApiClient();
-
+            mMap.setOnMapLongClickListener(this);
             mMap.setMyLocationEnabled(true);
         }
 
@@ -250,12 +258,13 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     }
 
     private void setUp(){
+        toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
         layoutmenu = (LinearLayout) findViewById(R.id.layoutmenu);
         btnOtherPlaceSearch = (Button) findViewById(R.id.btnOtherPlaceSearch);
         detailTable =(RelativeLayout) findViewById(R.id.detailTable);
         btnIncreRadius = (Button) findViewById(R.id.btnIncre);
         btnDecreRadius =(Button) findViewById(R.id.btnDecre);
-        btnDown = (ImageButton) findViewById(R.id.btnDown);
+        btnDown = (Button) findViewById(R.id.btnDown);
         btnGo = (Button) findViewById(R.id.btnGo);
         btnGoDetail = (Button) findViewById(R.id.btnGoDetail);
         btnShowDetail = (Button) findViewById(R.id.btnShowDetail);
@@ -268,23 +277,25 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         btnIncreRadius.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProximityRadius += 1000;
-                Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
-                Log.d("Radius",ProximityRadius+"");
-                nearPlaces(place,latitude,longitude,ProximityRadius);
-
+                if (!toggle && isNetworkConnected()) {
+                    ProximityRadius += 1000;
+                    Toast.makeText(MapsActivity.this, "Bán kính hiện tại : " + ProximityRadius, Toast.LENGTH_LONG).show();
+                    nearPlaces(place, latitude, longitude, ProximityRadius);
+                }
             }
         });
 
         btnDecreRadius.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(ProximityRadius >=2000){
-                ProximityRadius -= 1000;
-                Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
-                nearPlaces(place,latitude,longitude,ProximityRadius);}
-                else{
-                    Toast.makeText(MapsActivity.this,"Không thể giảm bán kính tìm kiếm",Toast.LENGTH_LONG).show();
+                if (!toggle && isNetworkConnected()) {
+                    if (ProximityRadius >= 2000) {
+                        ProximityRadius -= 1000;
+                        Toast.makeText(MapsActivity.this, "Bán kính hiện tại : " + ProximityRadius, Toast.LENGTH_LONG).show();
+                        nearPlaces(place, latitude, longitude, ProximityRadius);
+                    } else {
+                        Toast.makeText(MapsActivity.this, "Không thể giảm bán kính tìm kiếm", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
@@ -292,13 +303,16 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DrawRoutes(latLng,desLocation);
+                if (!toggle && isNetworkConnected()) {
+                    DrawRoutes(latLng, desLocation);
+                }
             }
         });
 
         btnShowDetail.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(MapsActivity.this, ShowDetailPlaceActivity.class);
                 intent.putExtra("DataPlace",placeData);
                 intent.putExtra("dataHour",directionsParser.duration.getText());
@@ -310,20 +324,33 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         btnDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mMap.clear();
-                detailTable.setVisibility(View.INVISIBLE);
-                getMarker(lastLocation);
+                if (directing && !toggle && isNetworkConnected()) {
+                    mMap.clear();
+                    detailTable.setVisibility(View.INVISIBLE);
+                    getMarker(lastLocation);
+                    directing = false;
+                }else{
+                    detailTable.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
         btnOtherPlaceSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                layoutmenu.setVisibility(View.INVISIBLE);
-                autocompleteFragment.getView().setVisibility(View.VISIBLE);
+                if(!toggle && isNetworkConnected()) {
+                    layoutmenu.setVisibility(View.INVISIBLE);
+                    autocompleteFragment.getView().setVisibility(View.VISIBLE);
+                }
             }
         });
 
+        toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggle = true;
+            }
+        });
     }
 
 //    public void getAnotherAddress(String otherPlace){
@@ -357,26 +384,26 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 //            }
 //        }
 //    }
+
     @Override
     public void onLocationChanged(Location location)
     {
-        getMarker(location);
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<ResultDetailPlace> list = ServicesDB.getDetailPlace(new LatLng(location.getLatitude(),location.getLongitude()),"restaurant", 2.0, realm);
+        if (!toggle && isNetworkConnected()) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            getMarker(latLng);
+//        Realm realm = Realm.getDefaultInstance();
+//        ArrayList<ResultDetailPlace> list = ServicesDB.getDetailPlace(new LatLng(location.getLatitude(),location.getLongitude()),"restaurant", 2.0, realm);
+        }
+        CameraUpdate camera = CameraUpdateFactory.newLatLngZoom(
+                latLng, 15);
+        mMap.moveCamera(camera);
     }
 
-    private void getMarker(Location location){
-
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-
-        lastLocation = location;
-
-        if (currentUserLocationMarker != null) {
-            currentUserLocationMarker.remove();
-        }
-
-        latLng = new LatLng(location.getLatitude(), location.getLongitude());
+    private void getMarker(LatLng location){
+        latitude = location.latitude;
+        longitude = location.longitude;
+        latLng = location;
+        lastLocation = latLng;
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
@@ -385,15 +412,20 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 
         currentUserLocationMarker = mMap.addMarker(markerOptions);
         currentUserLocationMarker.showInfoWindow();
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
+         //Store these lat lng values somewhere. These should be constant.
 
         if (googleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
-        nearPlaces(place, latitude,longitude,ProximityRadius);
+        if (!toggle && isNetworkConnected()) {
+            nearPlaces(place, latitude, longitude, ProximityRadius);
+        }
     }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        return cm.getActiveNetworkInfo() != null;
+    }
     private void nearPlaces(String place, double lat, double lng, int ProximityRadius){
         List<Address> addressList = null;
         MarkerOptions userMarkerOptions = new MarkerOptions();
@@ -423,7 +455,6 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 
     @Override
     public void notifyViewStatus(final DetailPlace data) {
-
         if (data == null) return;
         detailTable.setVisibility(View.VISIBLE); // Hien thi detail
         detailName.setText(data.result.name);
@@ -440,10 +471,12 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
                 detailOpenNow.setVisibility(View.INVISIBLE);
             }
         }
-
-        rat.setRating(data.result.rating);
-        desLocation = data.result.latLng.getLatLng();
-
+        if (data.result != null && data.result.rating != null) {
+            rat.setRating(data.result.rating);
+            if (data.result.latLng != null && data.result.latLng.latitude != null) {
+                desLocation = data.result.latLng.getLatLng();
+            }
+        }
         placeData = data;
         getDirection(latLng, desLocation);
     }
@@ -487,6 +520,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
 
         polylinePaths.add(mMap.addPolyline(polylineOptions));
         mRoutes.clear();
+        directing = true;
         return true;
     }
 
@@ -495,7 +529,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         String str_dest = "destination=" +dest.latitude +"," +dest.longitude;
         String sensor = "sensor=false";
         String mode = "mode=driving";
-        String key = "key=AIzaSyAgfFbBLZ-XfwSwBgZ1ztkRd2R3JLq03Kc";
+        String key = "key=AIzaSyC24CZtkc8CSjV8uyNjKqJtlc7pqGuedg4";
         String lang ="&language=vi";
         String param = str_origin +"&" +str_dest +"&" +sensor +"&" +lang+"&"+mode +"&" +key;
         String output ="json";
@@ -540,21 +574,41 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
     @Override
     public void onPlaceSelected(Place place1) {
         mMap.clear();
+        autocompleteFragment.getView().setVisibility(View.INVISIBLE);
+        layoutmenu.setVisibility(View.VISIBLE);
         LatLng latLngPlace = place1.getLatLng();
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLngPlace);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        mMap.addMarker(markerOptions);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngPlace));
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
-
-        nearPlaces(place, place1.getLatLng().latitude,place1.getLatLng().longitude,ProximityRadius);
+        mMap.addMarker(markerOptions); //Store these lat lng values somewhere. These should be constant.
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                latLngPlace, 15);
+        mMap.moveCamera(location);
+        lastLocation = latLngPlace;
+        nearPlaces(place, latLngPlace.latitude, latLngPlace.longitude,ProximityRadius);
     }
 
     @Override
     public void onError(Status status) {
 
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        if (!toggle && isNetworkConnected()){
+            mMap.clear();
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            mMap.addMarker(markerOptions); //Store these lat lng values somewhere. These should be constant.
+            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                    latLng, 15);
+            mMap.moveCamera(location);
+            lastLocation = latLng;
+            nearPlaces(place, latLng.latitude, latLng.longitude,ProximityRadius);
+
+        }
     }
 
     public class TaskRequestDirections extends AsyncTask<String,Void,String> {
@@ -601,7 +655,7 @@ public class MapsActivity extends FragmentActivity implements PlaceSelectionList
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
             mRoutes = lists;
-            detailKm.setText(directionsParser.duration.getText() + " | " + directionsParser.distance.getText());
+            detailKm.setText((directionsParser.duration != null)?directionsParser.duration.getText():"" + " | " + ((directionsParser.duration != null)?directionsParser.distance.getText():""));
 
          //   detailDirection.setDistance(directionsParser.distance.getText());
            // detailDirection.setDuration(directionsParser.duration.getText());

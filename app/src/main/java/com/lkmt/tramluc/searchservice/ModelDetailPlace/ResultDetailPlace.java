@@ -6,8 +6,7 @@ import android.os.Parcelable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
-
-import io.realm.Realm;
+import java.lang.String;
 import io.realm.RealmList;
 
 
@@ -26,7 +25,7 @@ public class ResultDetailPlace implements Parcelable {
     private ArrayList<String> castToArrayListString(RealmList<String> list){
        ArrayList<String> a = new ArrayList<>();
         for (String item: list) {
-            a.add(item);
+            a.add(new String(item));
         }
         return a;
     }
@@ -34,24 +33,23 @@ public class ResultDetailPlace implements Parcelable {
         if (list == null) return;
         reviews = new ArrayList<Reviews>();
         for (Reviews item:list){
-            reviews.add(item);
+            reviews.add(new Reviews(item));
         }
     }
     public void setDataFromRealm(ResultDetailPlaceRealm data){
-        Realm realm = Realm.getDefaultInstance();
-        formatted_address = data.formatted_address;
-        formatted_phone_number = data.formatted_phone_number;
-        name = data.name;
-        rating = data.rating;
-        website = data.website;
+        formatted_address = new String(data.formatted_address);
+        formatted_phone_number = new String(data.formatted_phone_number);
+        name = new String(data.name);
+        rating = new Float(data.rating);
+        website = new String(data.website);
         if (data.opening_hours != null) {
             opening_hours = new Opening_Hours();
-            opening_hours.open_now = data.opening_hours.open_now;
+            opening_hours.open_now = new Boolean(data.opening_hours.open_now);
             opening_hours.weekday_text = castToArrayListString(data.opening_hours.weekday_text);
         }
-        latLng = data.latLng;
+        latLng = new LatLngg(data.latLng);
         castToArrayListReviews(data.reviews);
-        type = data.type;
+        type = new String(data.type);
     }
     @Override
     public int describeContents() {
@@ -60,14 +58,15 @@ public class ResultDetailPlace implements Parcelable {
     public ResultDetailPlace(){}
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(formatted_address);
-        dest.writeString(formatted_phone_number);
-        dest.writeString(name);
-        dest.writeFloat(rating);
-        dest.writeString(website);
+        dest.writeString(new String(formatted_address));
+        dest.writeString(new String(formatted_phone_number));
+        dest.writeString(new String(name));
+        dest.writeFloat(new Float(rating));
+        dest.writeString(new String(website));
         dest.writeParcelable(opening_hours, flags);
         dest.writeDouble(latLng.latitude);
         dest.writeDouble(latLng.longitude);
+        dest.writeByte((byte)(reviews!=null?1:0));
         dest.writeTypedList(reviews);
         dest.writeString(type);
     }
@@ -85,8 +84,14 @@ public class ResultDetailPlace implements Parcelable {
         this.opening_hours = in.readParcelable(Opening_Hours.class.getClassLoader());
         Double lati = in.readDouble();
         Double longi = in.readDouble();
-        this.latLng = new LatLngg(lati,longi);
-        in.readTypedList(reviews,Reviews.CREATOR);
+        this.latLng = new LatLngg();
+        this.latLng.latitude = lati;
+        this.latLng.longitude = longi;
+        reviews = new ArrayList<>();
+        Byte a = in.readByte();
+        if (a == 1) {
+            in.readTypedList(reviews, Reviews.CREATOR);
+        }
         this.type = in.readString();
 
     }
