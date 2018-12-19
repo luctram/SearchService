@@ -24,4 +24,21 @@ public class TabHost_Reviews extends Fragment {
         //TextView e = (TextView) v.findViewById(R.id.textView);
         return v;
     }
+<<<<<<< HEAD
+=======
+
+    private void anhxa(View v){
+        listViewReviews = (ListView) v.findViewById(R.id.listview_reviews);
+        arrReviews = new ArrayList<Reviews>();
+        for (int i=0; i< data.result.reviews.size(); i++){
+
+            arrReviews.add(new Reviews(data.result.reviews.get(i).author_name,data.result.reviews.get(i).relative_time_description,data.result.reviews.get(i).profile_photo_url,data.result.reviews.get(i).rating,data.result.reviews.get(i).text));
+
+        }
+
+   }
+    public void getData(DetailPlace data){
+        this.data = data;
+    }
+>>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
 }

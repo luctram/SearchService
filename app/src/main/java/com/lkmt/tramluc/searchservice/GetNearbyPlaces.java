@@ -1,6 +1,8 @@
 package com.lkmt.tramluc.searchservice;
 
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -27,6 +29,11 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
     private String googleplaceData, url;
     private GoogleMap mMap;
     private HashMap<String, Integer> mMarkers;
+<<<<<<< HEAD
+=======
+    private ArrayList<MarkerOptions> listMarkers;
+    //private HashMap<String,LatLng> mData1;
+>>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
     private List<DetailPlace> mData;
     public CallBackMap callback;
     public void setCallBack(CallBackMap callback){
@@ -69,6 +76,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
     private void DisplayNearbyPlaces(List<HashMap<String, String>> nearByPlacesList) throws IOException
     {
+        listMarkers = new ArrayList<>();
         mMarkers = new HashMap<String, Integer>();
         mData = new ArrayList<DetailPlace>();
         Services sv;
@@ -109,7 +117,6 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
             }
         });
     }
-
     private DetailPlace getDetailPlace(String placeid, LatLng latLng) throws IOException{
         String url = getDetailUrl(placeid);
         ObjectMapper mapper = new ObjectMapper();
@@ -118,7 +125,14 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
         try {
             data = mapper.readValue(new URL(url), DetailPlace.class);
+<<<<<<< HEAD
             data.result.latLng = latLng;
+=======
+            if (data.result != null) {
+                data.result.latLng = new LatLngg();
+                data.result.latLng.setLatLng(latLng);
+            }
+>>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
         }
         catch (MalformedURLException err){
             Log.d("ChecckERR", err.getMessage()+"");
