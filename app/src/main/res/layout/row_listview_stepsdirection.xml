@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
+        android:background="#F0F0F0">
+
+
+        <TextView
+            android:id="@+id/stepDescribe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="9dp"
+            android:layout_marginLeft="9dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginBottom="5dp"
+            android:fontFamily="sans-serif"
+            android:text="TextView"
+            android:textColor="#000000"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/stepDistance"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="9dp"
+            android:layout_marginRight="9dp"
+            android:background="@drawable/square"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="1.4 km"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/stepDuration"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignTop="@+id/stepDistance"
+            android:layout_marginEnd="17dp"
+            android:layout_marginRight="17dp"
+            android:layout_toStartOf="@+id/stepDistance"
+            android:layout_toLeftOf="@+id/stepDistance"
+            android:background="@drawable/square"
+            android:drawableLeft="@mipmap/icon_car1"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="16 phút"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="11sp" />
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

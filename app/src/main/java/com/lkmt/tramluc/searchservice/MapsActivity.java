@@ -1,11 +1,15 @@
 package com.lkmt.tramluc.searchservice;
 
 import android.Manifest;
+import android.app.Fragment;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -14,19 +18,30 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,7 +54,13 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.CallBackMap;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.ResultDetailPlace;
+import com.lkmt.tramluc.searchservice.ModelDirection.DetailDirection;
 import com.lkmt.tramluc.searchservice.ModelDirection.DirectionsParser;
+import com.lkmt.tramluc.searchservice.ModelDirection.Duration;
+import com.lkmt.tramluc.searchservice.ModelDirection.StepsDirection;
+import com.lkmt.tramluc.searchservice.ModelDirection.StepsDirectionAdapter;
+import com.lkmt.tramluc.searchservice.Realm.ServicesDB;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,37 +75,54 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+import io.realm.Realm;
+
+import static com.lkmt.tramluc.searchservice.Realm.ServicesDB.getDetailPlaceFromFireBase;
+
+public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLongClickListener, PlaceSelectionListener, CallBackMap, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
-    Button btnAddRadius;
+
     String serviceName, placenName,place, namePlace;
     TextView serviceName1;
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
-    private Location lastLocation;
+    private LatLng lastLocation;
     private Marker currentUserLocationMarker;
     private static final int Request_User_Location_Code = 99;
-    private double latitide, longitude;
+    private double latitude, longitude;
     private LatLng latLng;
+    private Boolean directing = false;
     private LatLng desLocation;
     private DetailPlace placeData;
     private int ProximityRadius = 1000;
+    private int Radius = 1;
     private static final int LOCATION_REQUEST =500;
     private List<Polyline> polylinePaths = new ArrayList<>(); // add line of direction
+    private List<List<HashMap<String, String>>> mRoutes = new ArrayList<>();
+    private  DirectionsParser directionsParser = new DirectionsParser();
+    private ArrayList<MarkerOptions> listMarkers;
     TextView detailName = null, detailOpenNow=null, detailKm=null,detailAddress=null; //MapsActivity
-    TextView tab_txtRating =null, tab_txtKm=null, tab_txtHour =null,tab_txtAddress=null, tab_txtPhone=null,tab_txtWebsite=null; //tabhost_detail
-    TextView txtplaceName=null; // activityDetailPlace
-    Button btnGo, btnGoDetail, btnShowDetail;
+    Button btnIncreRadius,btnDecreRadius ,btnGo, btnGoDetail, btnShowDetail, btnOtherPlaceSearch;
+    Button btnDown, btnCancelDirecion;
     RatingBar rat;
-    RelativeLayout detailTable;
+    RelativeLayout detailTable, directionTable;
+    LinearLayout layoutmenu;
+    ToggleButton toggleButton;
+    Boolean toggle = false;
+    PlaceAutocompleteFragment autocompleteFragment;
+    ArrayList<StepsDirection> arrDirection;
+    StepsDirectionAdapter adapterDirection;
+    ListView listViewDirection;
+
+    public DetailDirection detailDirection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        setUp();
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
@@ -95,6 +133,13 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.myMap);
         mapFragment.getMapAsync(this);
+
+        autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+        autocompleteFragment.getView().setVisibility(View.INVISIBLE);
+
+        setUp();
+
         Intent intent = getIntent();
         serviceName = intent.getStringExtra("NameService");
         serviceName1 = (TextView) findViewById(R.id.txtplaceName);
@@ -103,30 +148,6 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         String[] arStr = placenName.split("/");
         place = arStr[0];
         namePlace = arStr[1];
-
-
-        btnAddRadius.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ProximityRadius += 1000;
-                Toast.makeText(MapsActivity.this,"Bán kính hiện tại : "+ ProximityRadius,Toast.LENGTH_LONG).show();
-            }
-        });
-
-//        btnGo.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//
-//        btnGoDetail.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-
     }
 
 
@@ -136,7 +157,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             buildGoogleApiClient();
-
+            mMap.setOnMapLongClickListener(this);
             mMap.setMyLocationEnabled(true);
         }
 
@@ -240,55 +261,17 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-    @Override
-    public void onLocationChanged(Location location)
-    {
-        latitide = location.getLatitude();
-        longitude = location.getLongitude();
-
-        lastLocation = location;
-
-        if (currentUserLocationMarker != null) {
-            currentUserLocationMarker.remove();
-        }
-
-        latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Bạn đang ở đây");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-
-        currentUserLocationMarker = mMap.addMarker(markerOptions);
-        currentUserLocationMarker.showInfoWindow();
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
-
-        if (googleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        }
-        Log.d("CHECK123",latitide + " " + longitude);
-        nearPlaces(place,latitide,longitude);
-    }
-
-
-    private void nearPlaces(String place, double lat, double lng){
-        List<Address> addressList = null;
-        MarkerOptions userMarkerOptions = new MarkerOptions();
-        Geocoder geocoder = new Geocoder(this);
-        Object transferData[] = new Object[2];
-        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-        getNearbyPlaces.setCallBack(this);
-        String url = getUrl(lat, lng, place);
-        transferData[0] = mMap;
-        transferData[1] = url;
-        getNearbyPlaces.execute(transferData);
-        Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
-    }
 
     private void setUp(){
+        directionTable = (RelativeLayout) findViewById(R.id.directionTable);
+        toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
+        layoutmenu = (LinearLayout) findViewById(R.id.layoutmenu);
+        btnOtherPlaceSearch = (Button) findViewById(R.id.btnOtherPlaceSearch);
         detailTable =(RelativeLayout) findViewById(R.id.detailTable);
-        btnAddRadius = (Button) findViewById(R.id.btnIncre);
+        btnIncreRadius = (Button) findViewById(R.id.btnIncre);
+        btnDecreRadius =(Button) findViewById(R.id.btnDecre);
+        btnDown = (Button) findViewById(R.id.btnDown);
+        btnCancelDirecion = (Button) findViewById(R.id.btnCancelDirection);
         btnGo = (Button) findViewById(R.id.btnGo);
         btnGoDetail = (Button) findViewById(R.id.btnGoDetail);
         btnShowDetail = (Button) findViewById(R.id.btnShowDetail);
@@ -298,31 +281,192 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         detailKm = (TextView) findViewById(R.id.detail_km);
         rat = (RatingBar) findViewById(R.id.rat);
 
-        tab_txtRating = (TextView) findViewById(R.id.tab_txtRating);
-        tab_txtKm=(TextView) findViewById(R.id.tab_txtKm);
-        tab_txtHour =(TextView) findViewById(R.id.tab_txtHour);
-        tab_txtAddress=(TextView) findViewById(R.id .tab_txtAddress);
-        tab_txtPhone= (TextView) findViewById(R.id.tab_txtPhone);
-        tab_txtWebsite=(TextView) findViewById(R.id.tab_txtWebsite);
+        btnIncreRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!toggle && isNetworkConnected()) {
+                    ProximityRadius += 1000;
+                    Toast.makeText(MapsActivity.this, "Bán kính hiện tại : " + ProximityRadius, Toast.LENGTH_LONG).show();
+                    nearPlaces(place, latitude, longitude, ProximityRadius);
+                }
+            }
+        });
 
-        txtplaceName = (TextView) findViewById(R.id.txtplaceName);
+        btnDecreRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!toggle && isNetworkConnected()) {
+                    if (ProximityRadius >= 2000) {
+                        ProximityRadius -= 1000;
+                        Toast.makeText(MapsActivity.this, "Bán kính hiện tại : " + ProximityRadius, Toast.LENGTH_LONG).show();
+                        nearPlaces(place, latitude, longitude, ProximityRadius);
+                    } else {
+                        Toast.makeText(MapsActivity.this, "Không thể giảm bán kính tìm kiếm", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
 
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getDirection(latLng, desLocation);
+                if (!toggle && isNetworkConnected()) {
+                    detailTable.setVisibility(View.INVISIBLE);
+                    directionTable.setVisibility(View.VISIBLE);
+                    DrawRoutes(latLng, desLocation);
+                    showStepsDirection();
+                }
             }
         });
+
         btnShowDetail.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(MapsActivity.this, ShowDetailPlaceActivity.class);
                 intent.putExtra("DataPlace",placeData);
+                intent.putExtra("dataHour",directionsParser.duration.getText());
+                intent.putExtra("dataKm",directionsParser.distance.getText());
                 startActivity(intent);
             }
         });
+
+        btnDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (directing && !toggle && isNetworkConnected()) {
+                    mMap.clear();
+                    detailTable.setVisibility(View.INVISIBLE);
+                    getMarker(lastLocation);
+                    directing = false;
+                }else{
+                    detailTable.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        btnCancelDirecion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (directing && !toggle && isNetworkConnected()) {
+                    mMap.clear();
+                    directionTable.setVisibility(View.INVISIBLE);
+                    getMarker(lastLocation);
+                    directing = false;
+                }else{
+                    directionTable.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        btnOtherPlaceSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!toggle && isNetworkConnected()) {
+                    layoutmenu.setVisibility(View.INVISIBLE);
+                    autocompleteFragment.getView().setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggle = true;
+            }
+        });
     }
-    private String getUrl(double latitide, double longitude, String nearbyPlace)
+
+//    public void getAnotherAddress(String otherPlace){
+//        List<Address> addressList =null;
+//        if(otherPlace.trim() != ""){
+//            Geocoder geocoder = new Geocoder(this);
+//
+//            try {
+//                addressList = geocoder.getFromLocationName(otherPlace,1);
+//
+//                Log.d("CHECK123", addressList.size() +"");
+//                if(addressList.size() == 0){
+//                    addressList = geocoder.getFromLocationName(otherPlace,1);
+//                }
+//                if (addressList.size() >0){
+//                    Address add = addressList.get(0);
+//                    Log.d("CHECK1234", add.getLatitude() + "  " + add.getLongitude());
+//                    LatLng latLngPlace = new LatLng(add.getLatitude(),add.getLongitude());
+//                    MarkerOptions markerOptions = new MarkerOptions();
+//                        markerOptions.position(latLngPlace);
+//                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+//                        mMap.addMarker(markerOptions);
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngPlace));
+//                        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
+//
+//                    nearPlaces(place, latLngPlace.latitude,latLngPlace.longitude,ProximityRadius);
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        if (!toggle && isNetworkConnected()) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            getMarker(latLng);
+//        Realm realm = Realm.getDefaultInstance();
+//        ArrayList<ResultDetailPlace> list = ServicesDB.getDetailPlace(new LatLng(location.getLatitude(),location.getLongitude()),"restaurant", 2.0, realm);
+        }
+        CameraUpdate camera = CameraUpdateFactory.newLatLngZoom(
+                latLng, 15);
+        mMap.moveCamera(camera);
+    }
+
+    private void getMarker(LatLng location){
+        latitude = location.latitude;
+        longitude = location.longitude;
+        latLng = location;
+        lastLocation = latLng;
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title("Bạn đang ở đây");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+        currentUserLocationMarker = mMap.addMarker(markerOptions);
+        currentUserLocationMarker.showInfoWindow();
+         //Store these lat lng values somewhere. These should be constant.
+
+        if (googleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        }
+        if (!toggle && isNetworkConnected()) {
+            nearPlaces(place, latitude, longitude, ProximityRadius);
+        }
+    }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null;
+    }
+
+    private void nearPlaces(String place, double lat, double lng, int ProximityRadius){
+        List<Address> addressList = null;
+        MarkerOptions userMarkerOptions = new MarkerOptions();
+        Geocoder geocoder = new Geocoder(this);
+        Object transferData[] = new Object[2];
+        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+        getNearbyPlaces.setCallBack(this);
+        String url = getUrl(lat, lng, place, ProximityRadius );
+        transferData[0] = mMap;
+        transferData[1] = url;
+        getNearbyPlaces.execute(transferData);
+//        Toast.makeText(this, "Đang tìm " + namePlace, Toast.LENGTH_SHORT).show();
+    }
+
+//json cac dia diem gan
+    private String getUrl(double latitide, double longitude, String nearbyPlace, int ProximityRadius)
     {
         StringBuilder googleURL = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googleURL.append("location=" + latitide + "," + longitude);
@@ -336,9 +480,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
     @Override
     public void notifyViewStatus(final DetailPlace data) {
-
         if (data == null) return;
-
         detailTable.setVisibility(View.VISIBLE); // Hien thi detail
         detailName.setText(data.result.name);
         detailAddress.setText(data.result.formatted_address);
@@ -354,51 +496,71 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
                 detailOpenNow.setVisibility(View.INVISIBLE);
             }
         }
+        if (data.result != null && data.result.rating != null) {
+            rat.setRating(data.result.rating);
+        }
+        if (data.result.latLng != null && data.result.latLng.latitude != null) {
+            desLocation = data.result.latLng.getLatLng();
+        }
 
-        rat.setRating(data.result.rating);
-        desLocation = data.result.latLng;
         placeData = data;
-//        detailKm = ;
-
-
-
-
-        //        ta = (TextView) findViewById(R.id.detail_OpenHour);
-//        tab_txtPhone.setText(data.result.formatted_phone_number);
-//        tab_txtRating.setText(data.result.rating.toString());
-////        tab_txtHour = (TextView) findViewById(R.id.detail_hours);
-//        tab_txtAddress.setText(data.result.formatted_address);
-//        tab_txtWebsite.setText(data.result.website);
-////        tab_txtKm =
-
-
-//        txtplaceName.setText(data.result.name);
-
-
-
-
-
-
+        getDirection(latLng, desLocation);
     }
 
     public void getDirection(LatLng origin, LatLng dest){
         String url = getRequestUrl(origin,dest);
-        System.out.println(url);
         TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
         taskRequestDirections.execute(url);
     }
+    public Boolean DrawRoutes(LatLng origin, LatLng dest){
+        mMap.clear();
 
+        MarkerOptions markerOrigin = new MarkerOptions();
+        markerOrigin.position(origin);
+        markerOrigin.title("Bạn đang ở đây");
+        markerOrigin.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        MarkerOptions markerDest = new MarkerOptions();
+        markerDest.position(dest);
+        markerDest.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+        mMap.addMarker(markerOrigin);
+        mMap.addMarker(markerDest);
+        if (mRoutes.isEmpty()){return false;}
+        ArrayList points = null;
+        polylinePaths = new ArrayList<>();
+        PolylineOptions polylineOptions =null;
+
+        polylinePaths.clear();
+        for (List<HashMap<String,String>> path :mRoutes){
+            points =new ArrayList();
+            polylineOptions = new PolylineOptions();
+            for (HashMap<String,String> point: path){
+                double lat = Double.parseDouble(point.get("lat"));
+                double lng = Double.parseDouble(point.get("lng"));
+                points.add(new LatLng(lat,lng));
+            }
+            polylineOptions.addAll(points);
+            polylineOptions.width(13);
+            polylineOptions.color(R.color.colorBlue);
+            polylineOptions.geodesic(true);
+        }
+
+        polylinePaths.add(mMap.addPolyline(polylineOptions));
+        mRoutes.clear();
+        directing = true;
+        return true;
+    }
+
+    //json direction
     private String getRequestUrl(LatLng origin, LatLng dest){
         String str_origin = "origin=" + origin.latitude +"," + origin.longitude;
         String str_dest = "destination=" +dest.latitude +"," +dest.longitude;
         String sensor = "sensor=false";
         String mode = "mode=driving";
-        String key = "key=AIzaSyAgfFbBLZ-XfwSwBgZ1ztkRd2R3JLq03Kc";
-        String param = str_origin +"&" +str_dest +"&" +sensor +"&" +mode +"&" +key;
-//        String param = str_origin +"&" +str_dest +"&" +key;
+        String key = "key=AIzaSyC24CZtkc8CSjV8uyNjKqJtlc7pqGuedg4";
+        String lang ="&language=vi";
+        String param = str_origin +"&" +str_dest +"&" +sensor +"&" +lang+"&"+mode +"&" +key;
         String output ="json";
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" +param;
-        Log.d("OK1234",url);
         return url;
     }
 
@@ -436,6 +598,57 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
         return responseString;
     }
 
+    public void showStepsDirection(){
+        listViewDirection = (ListView) findViewById(R.id.listviewDirection);
+        arrDirection = new ArrayList<StepsDirection>();
+        for(int i =0 ; i < directionsParser.totalStepsDirection; i++){
+            arrDirection.add(new StepsDirection(directionsParser.stepsDirections.get(i).getDurationStep(),directionsParser.stepsDirections.get(i).getDistanceStep(),directionsParser.stepsDirections.get(i).getDescribe()));
+        }
+
+        adapterDirection = new StepsDirectionAdapter(this, R.layout.row_listview_stepsdirection,arrDirection);
+        listViewDirection.setAdapter(adapterDirection);
+    }
+
+    @Override
+    public void onPlaceSelected(Place place1) {
+        mMap.clear();
+        autocompleteFragment.getView().setVisibility(View.INVISIBLE);
+        layoutmenu.setVisibility(View.VISIBLE);
+        LatLng latLngPlace = place1.getLatLng();
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLngPlace);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        mMap.addMarker(markerOptions);
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                latLngPlace, 15);
+        mMap.moveCamera(location);
+        lastLocation = latLngPlace;
+        nearPlaces(place, latLngPlace.latitude, latLngPlace.longitude,ProximityRadius);
+    }
+
+    @Override
+    public void onError(Status status) {
+
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        if (!toggle && isNetworkConnected()){
+            mMap.clear();
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            mMap.addMarker(markerOptions); //Store these lat lng values somewhere. These should be constant.
+            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                    latLng, 15);
+            mMap.moveCamera(location);
+            lastLocation = latLng;
+            nearPlaces(place, latLng.latitude, latLng.longitude,ProximityRadius);
+
+        }
+    }
+
     public class TaskRequestDirections extends AsyncTask<String,Void,String> {
 
         @Override
@@ -468,8 +681,8 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
             try{
                 jsonObject = new JSONObject(strings[0]);
-                DirectionsParser directionsParser = new DirectionsParser();
                 routes = directionsParser.parse(jsonObject);
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -479,26 +692,9 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
 
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
-            ArrayList points = null;
-            polylinePaths = new ArrayList<>();
-            PolylineOptions polylineOptions =null;
+            mRoutes = lists;
+            detailKm.setText((directionsParser.duration != null)?directionsParser.duration.getText():"" + " | " + ((directionsParser.duration != null)?directionsParser.distance.getText():""));
 
-            polylinePaths.clear();
-            for (List<HashMap<String,String>> path :lists){
-                points =new ArrayList();
-                polylineOptions = new PolylineOptions();
-                for (HashMap<String,String> point: path){
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
-                    points.add(new LatLng(lat,lng));
-                }
-                polylineOptions.addAll(points);
-                polylineOptions.width(10);
-                polylineOptions.color(R.color.background_floating_material_dark);
-                polylineOptions.geodesic(true);
-            }
-
-            polylinePaths.add(mMap.addPolyline(polylineOptions));
         }
 
 
@@ -514,7 +710,7 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
 
             case "Khu du lịch": {
-                place = "amusement_park";//art_gallery, campground, museum, park, zoo
+                place = "amusement_park";//|art_gallery|campground|museum|zoo
                 namePlace = "khu du lịch";
                 break;
             }
@@ -532,19 +728,19 @@ public class MapsActivity extends FragmentActivity implements CallBackMap, OnMap
             }
 
             case "Cửa hàng tiện lợi/Tạp hóa": {
-                place = "convenience_store"; //department_store
+                place = "convenience_store"; //|department_store
                 namePlace ="cửa hàng tiện lợi/tạp hóa";
                 break;
             }
 
             case "Khách sạn/Nhà nghỉ": {
-                place = "hotel";
+                place = "lodging";
                 namePlace ="khách sạn/nhà nghỉ";
                 break;
             }
 
             case "Quán bar": {
-                place = "bar"; //night_club
+                place = "bar"; //|night_club
                 namePlace ="quán bar";
                 break;
             }

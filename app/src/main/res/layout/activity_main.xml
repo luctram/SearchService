@@ -5,13 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F0F0F0">
-
-
     <ListView
         android:id="@+id/listview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:background="#F0F0F0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,15 +20,26 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
-        android:layout_height="55dp"
-        android:background="@mipmap/ic_launcher"
+        android:layout_height="48dp"
+        android:background="@mipmap/background"
+        android:fontFamily="sans-serif"
         android:gravity="center"
         android:text="CHỌN DỊCH VỤ"
-        android:textColor="@android:color/background_dark"
-        android:textSize="30sp"
-        android:fontFamily="sans-serif"
+        android:textColor="#000000"
+        android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnUpdate"
+        android:layout_width="56dp"
+        android:layout_height="50dp"
+        android:background="@mipmap/icon_updatemaps1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,6 @@
 package com.lkmt.tramluc.searchservice;
 
-import com.lkmt.tramluc.searchservice.ModelDetailPlace.ReviewService;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.Reviews;
 
 public class Services {
 
@@ -13,7 +13,7 @@ public class Services {
     public String phone;
     public String address;
     public int rate;
-    public ReviewService review;
+    public Reviews review;
     public String describe;
     public int countLike;
     public String website;
@@ -23,7 +23,7 @@ public class Services {
     public Services() {
     }
 
-    public Services(String typeServiceId, String cityId, String serviceId, String serviceName, double lat, double lng, String phone, String address, int allRate, ReviewService review, String describe, int countLike, String website) {
+    public Services(String typeServiceId, String cityId, String serviceId, String serviceName, double lat, double lng, String phone, String address, int allRate, Reviews review, String describe, int countLike, String website) {
         this.typeServiceId = typeServiceId;
         this.cityId = cityId;
         this.serviceId = serviceId;

@@ -1,5 +1,6 @@
 package com.lkmt.tramluc.searchservice.ModelDirection;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -22,6 +23,11 @@ public class DirectionsParser {
     /**
      * Returns a list of lists containing latitude and longitude from a JSONObject
      */
+    public Distance distance;
+    public Duration duration;
+    public Steps steps;
+    public ArrayList<StepsDirection> stepsDirections;
+    public int totalStepsDirection;
     public List<List<HashMap<String, String>>> parse(JSONObject jObject) {
 
         List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
@@ -30,6 +36,7 @@ public class DirectionsParser {
         try {
 
             jsonRoutes = jObject.getJSONArray("routes");
+
 
             // Loop for all routes
             for (int i = 0; i < jsonRoutes.length(); i++) {
@@ -40,16 +47,28 @@ public class DirectionsParser {
                 JSONArray jsonSteps = jsonLeg.getJSONArray("steps");
                 JSONObject jsonDistance = jsonLeg.getJSONObject("distance");
                 JSONObject jsonDuration = jsonLeg.getJSONObject("duration");
-                Distance distance = new Distance(jsonDistance.getString("text"), jsonDistance.getInt("value"));
-                Duration duration = new Duration(jsonDuration.getString("text"),jsonDuration.getInt("value"));
+                distance = new Distance(jsonDistance.getString("text"), jsonDistance.getInt("value"));
+                duration = new Duration(jsonDuration.getString("text"),jsonDuration.getInt("value"));
+                totalStepsDirection = jsonSteps.length();
+                stepsDirections = new ArrayList<>();
                 for (int j = 0; j<jsonSteps.length(); j++){
                     JSONObject jsonStep = jsonSteps.getJSONObject(j);
-                    Steps steps = new Steps();
+                    steps = new Steps();
                     JSONObject jStepDistance = jsonStep.getJSONObject("distance");
-                    steps.distance = new Distance(jStepDistance.getString("text"),jStepDistance.getInt("value"));
-
                     JSONObject jStepDuration = jsonStep.getJSONObject("duration");
-                    steps.duration = new Duration(jStepDuration.getString("text"),jStepDuration.getInt("value"));
+                    stepsDirections.add(new StepsDirection(new Duration(jStepDuration.getString("text"), jStepDuration.getInt("value")), new Distance(jStepDistance.getString("text"), jStepDistance.getInt("value")),jsonStep.getString("html_instructions")));
+
+                   // stepsDirection.setDescribe(jsonStep.getString("html_instructions"));
+
+
+                  //      stepsDirection.setDistanceStep(new Distance(jStepDistance.getString("text"), jStepDistance.getInt("value")));
+                    //    Log.d("CHECK123", stepsDirection.getDistanceStep().getText());
+
+
+                      //  stepsDirection.setDurationStep(new Duration(jStepDuration.getString("text"), jStepDuration.getInt("value")));
+
+
+
 
                     JSONObject jStepPolyline = jsonStep.getJSONObject("polyline");
                     steps.polyline = new polyline(jStepPolyline.getString("points"));
