@@ -1,8 +1,5 @@
 package com.lkmt.tramluc.searchservice;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,9 +62,6 @@ public class DataParser {
 
         HashMap<String, String> NearbyPlaceMap = null;
 
-        if (counter == 0){
-            Log.d("dataParser","ko tìm thấy dịch vụ");
-        }
         for (int i=0; i<counter; i++)
         {
             try

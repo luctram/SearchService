@@ -9,18 +9,16 @@
     <TextView
         android:id="@+id/txtplaceName"
         android:layout_width="match_parent"
-        android:layout_height="57dp"
-        android:layout_marginTop="0dp"
-        android:background="@mipmap/background"
-        android:fontFamily="sans-serif"
+        android:layout_height="55dp"
+        android:background="@mipmap/ic_launcher"
         android:gravity="center_vertical"
         android:text=" Trung tâm thương mại"
-        android:textColor="#000000"
+        android:textColor="@android:color/background_dark"
         android:textSize="27sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
+        android:fontFamily="sa"
         app:layout_constraintTop_toTopOf="parent" />
 
     <fragment
@@ -30,29 +28,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutmenu" />
+        app:layout_constraintTop_toBottomOf="@+id/txtplaceName" />
 
-    <fragment
-        android:id="@+id/place_autocomplete_fragment"
-        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
+    <Button
+        android:id="@+id/btnIncre"
+        android:layout_width="46dp"
+        android:layout_height="57dp"
+        android:background="@android:drawable/checkbox_off_background"
+        android:gravity="center"
+        android:text="+"
+        android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/layoutmenu" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:textColor="#663366" />
 
     <RelativeLayout
         android:id="@+id/detailTable"
-        android:layout_width="0dp"
+        android:layout_width="351dp"
         android:layout_height="170dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginRight="25dp"
         android:animateLayoutChanges="true"
-        android:background="#FFFFFF"
+        android:background="@color/common_google_signin_btn_text_dark_default"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,8 +60,6 @@
             android:layout_width="350dp"
             android:layout_height="37dp"
             android:layout_centerVertical="false"
-            android:layout_marginStart="25dp"
-            android:layout_marginLeft="25dp"
             android:background="#F6CECE"
             android:gravity="center"
             android:text="Shopping mall"
@@ -75,15 +69,11 @@
 
         <TextView
             android:id="@+id/detail_OpenNow"
-            android:layout_width="138dp"
+            android:layout_width="99dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/scrollView1"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="21dp"
-            android:layout_marginLeft="21dp"
-            android:layout_marginEnd="1dp"
-            android:layout_marginRight="1dp"
+            android:layout_marginStart="52dp"
+            android:layout_marginLeft="52dp"
             android:layout_marginBottom="-5dp"
             android:layout_toEndOf="@+id/detail_km"
             android:layout_toRightOf="@+id/detail_km"
@@ -111,6 +101,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/detail_Name"
+            android:layout_alignParentStart="true"
             android:layout_weight="1">
 
             <LinearLayout
@@ -123,7 +114,6 @@
                     style="?android:attr/ratingBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
                     android:layout_weight="0.07"
                     android:isIndicator="false"
                     android:numStars="5"
@@ -137,6 +127,8 @@
             android:layout_width="wrap_content"
             android:layout_height="19dp"
             android:layout_below="@+id/detail_Name"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="100dp"
             android:drawableLeft="@mipmap/icon_car1"
             android:gravity="center"
             android:text="500m" />
@@ -146,8 +138,10 @@
             android:layout_width="258dp"
             android:layout_height="27dp"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/roundcornerbutton"
+            android:layout_marginEnd="-158dp"
             android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/detail_km"
+            android:background="@android:color/holo_red_light"
             android:text="Xem chi tiết"
             android:textColor="@android:color/background_light"
             android:textSize="16dp"
@@ -158,84 +152,15 @@
             android:layout_width="157dp"
             android:layout_height="26dp"
             android:layout_alignTop="@+id/btnShowDetail"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="1dp"
-            android:background="@drawable/roundcornerbutton"
+            android:layout_marginEnd="1dp"
+            android:background="@android:color/holo_red_light"
             android:drawableRight="@mipmap/icon_direction1"
             android:text="Chỉ đường"
             android:textColor="@android:color/background_light"
             android:textSize="16dp"
             android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnDown"
-            android:layout_width="25dp"
-            android:layout_height="37dp"
-            android:layout_alignBottom="@+id/detail_Name"
-            android:background="@color/common_google_signin_btn_text_dark_disabled"
-            app:srcCompat="@mipmap/icon_down"/>
-
     </RelativeLayout>
-
-
-    <LinearLayout
-        android:id="@+id/layoutmenu"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-        android:background="#F9F8F8"
-        android:orientation="horizontal"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtplaceName">
-
-        <Button
-            android:id="@+id/btnIncre"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/roundcornerbuttongray"
-            android:fontFamily="sans-serif"
-            android:text="+"
-            android:textSize="12dp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="113dp"
-            tools:textColor="#663366" />
-
-        <Button
-            android:id="@+id/btnDecre"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/roundcornerbuttongray"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:text="-"
-            android:textSize="12dp"
-            android:textStyle="bold"
-            tools:layout_editor_absoluteX="129dp"
-            tools:layout_editor_absoluteY="107dp"
-            tools:textColor="#663366" />
-
-        <Button
-            android:id="@+id/btnOtherPlaceSearch"
-            android:layout_width="268dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="24dp"
-            android:layout_marginRight="24dp"
-            android:background="@drawable/roundcornerbuttongray"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:text="Chọn địa điểm tìm kiếm"
-            android:textSize="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_editor_absoluteY="99dp" />
-    </LinearLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>

@@ -13,7 +13,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.CallBackMap;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
-import com.lkmt.tramluc.searchservice.ModelDetailPlace.LatLngg;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,7 +27,6 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
     private String googleplaceData, url;
     private GoogleMap mMap;
     private HashMap<String, Integer> mMarkers;
-    //private HashMap<String,LatLng> mData1;
     private List<DetailPlace> mData;
     public CallBackMap callback;
     public void setCallBack(CallBackMap callback){
@@ -73,7 +71,6 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
     {
         mMarkers = new HashMap<String, Integer>();
         mData = new ArrayList<DetailPlace>();
-       // mData1 = new HashMap<String,LatLng>();
         Services sv;
         for (int i=0; i< nearByPlacesList.size(); i++)
         {
@@ -91,12 +88,13 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
 
             mData.add(getDetailPlace(place_id+"", latLng));
-          //  mData1.put(place_id,latLng);
 
             Marker marker = mMap.addMarker(markerOptions);
             mMarkers.put(marker.getId(),i);
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker){
@@ -120,8 +118,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
         try {
             data = mapper.readValue(new URL(url), DetailPlace.class);
-            data.result.latLng = new LatLngg();
-            data.result.latLng.setLatLng(latLng);
+            data.result.latLng = latLng;
         }
         catch (MalformedURLException err){
             Log.d("ChecckERR", err.getMessage()+"");

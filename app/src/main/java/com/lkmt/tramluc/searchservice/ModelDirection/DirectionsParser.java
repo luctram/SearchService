@@ -1,6 +1,5 @@
 package com.lkmt.tramluc.searchservice.ModelDirection;
 
-import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -23,8 +22,6 @@ public class DirectionsParser {
     /**
      * Returns a list of lists containing latitude and longitude from a JSONObject
      */
-    public Distance distance;
-    public Duration duration;
     public List<List<HashMap<String, String>>> parse(JSONObject jObject) {
 
         List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
@@ -43,8 +40,8 @@ public class DirectionsParser {
                 JSONArray jsonSteps = jsonLeg.getJSONArray("steps");
                 JSONObject jsonDistance = jsonLeg.getJSONObject("distance");
                 JSONObject jsonDuration = jsonLeg.getJSONObject("duration");
-                distance = new Distance(jsonDistance.getString("text"), jsonDistance.getInt("value"));
-                duration = new Duration(jsonDuration.getString("text"),jsonDuration.getInt("value"));
+                Distance distance = new Distance(jsonDistance.getString("text"), jsonDistance.getInt("value"));
+                Duration duration = new Duration(jsonDuration.getString("text"),jsonDuration.getInt("value"));
                 for (int j = 0; j<jsonSteps.length(); j++){
                     JSONObject jsonStep = jsonSteps.getJSONObject(j);
                     Steps steps = new Steps();

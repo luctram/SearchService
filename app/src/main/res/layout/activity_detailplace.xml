@@ -7,19 +7,17 @@
 
     <TextView
         android:id="@+id/txtplaceName"
-        android:layout_width="395dp"
+        android:layout_width="340dp"
         android:layout_height="50dp"
-        android:background="@mipmap/background"
+        android:background="@android:color/darker_gray"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical"
         android:text=" Trung tâm thương mại"
-        android:textColor="#000000"
+        android:textColor="@android:color/background_dark"
         android:textSize="27sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-        <!--app:layout_constraintStart_toEndOf="@+id/imageButton"-->
-
 
     <android.support.v4.app.FragmentTabHost
         android:id="@+id/tabsHost"
@@ -67,15 +65,15 @@
         </LinearLayout>
     </android.support.v4.app.FragmentTabHost>
 
-    <!--<ImageButton-->
-        <!--android:id="@+id/imageButton"-->
-        <!--android:layout_width="50dp"-->
-        <!--android:layout_height="50dp"-->
-        <!--android:background="@mipmap/background"-->
-        <!--app:layout_constraintEnd_toStartOf="@+id/txtplaceName"-->
-        <!--app:layout_constraintHorizontal_bias="0.0"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent"-->
-        <!--app:srcCompat="@mipmap/icon_back" />-->
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toStartOf="@+id/txtplaceName"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/icon_back" />
 
 </android.support.constraint.ConstraintLayout>
