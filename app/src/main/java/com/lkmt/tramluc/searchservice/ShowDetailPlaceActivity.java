@@ -29,27 +29,9 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
 //        tabhost.setup();
 //        tabhost.setup();
 
-<<<<<<< HEAD
         //Tab show detail
         tab_detail = tabhost.newTabSpec("Tab one").setIndicator("Chi tiết");
         tab_detail.setIndicator("Chi tiết");
-=======
-        txtplaceName = findViewById(R.id.txtplaceName);
-        txtplaceName.setText(new String(data.result.name));
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment.getClass() == TabHost_DetailPlace.class) {
-            TabHost_DetailPlace detailPlace = (TabHost_DetailPlace) fragment;
-            detailPlace.getData(data);
-
-            TabHost_DetailPlace dataKm = (TabHost_DetailPlace) fragment;
-//            dataKm.getDataKm(dataKm);
-//
->>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
 
 
         //Tab show reviews

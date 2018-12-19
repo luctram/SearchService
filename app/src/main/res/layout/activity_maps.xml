@@ -60,13 +60,6 @@
             android:layout_width="350dp"
             android:layout_height="37dp"
             android:layout_centerVertical="false"
-<<<<<<< HEAD
-=======
-            android:layout_marginStart="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_toEndOf="@+id/btnDown"
-            android:layout_toRightOf="@+id/btnDown"
->>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
             android:background="#F6CECE"
             android:gravity="center"
             android:text="Shopping mall"
@@ -76,23 +69,11 @@
 
         <TextView
             android:id="@+id/detail_OpenNow"
-<<<<<<< HEAD
             android:layout_width="99dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/scrollView1"
             android:layout_marginStart="52dp"
             android:layout_marginLeft="52dp"
-=======
-            android:layout_width="115dp"
-            android:layout_height="19dp"
-            android:layout_alignBottom="@+id/scrollView1"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="38dp"
-            android:layout_marginLeft="38dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginRight="0dp"
->>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
             android:layout_marginBottom="-5dp"
             android:layout_toEndOf="@+id/detail_km"
             android:layout_toRightOf="@+id/detail_km"
@@ -146,38 +127,21 @@
             android:layout_width="wrap_content"
             android:layout_height="19dp"
             android:layout_below="@+id/detail_Name"
-<<<<<<< HEAD
             android:layout_alignParentStart="true"
             android:layout_marginStart="100dp"
-=======
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="0dp"
-            android:layout_toEndOf="@+id/scrollView1"
-            android:layout_toRightOf="@+id/scrollView1"
->>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
             android:drawableLeft="@mipmap/icon_car1"
             android:gravity="center"
             android:text="500m" />
 
         <Button
             android:id="@+id/btnShowDetail"
-            android:layout_width="142dp"
-            android:layout_height="29dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
+            android:layout_width="258dp"
+            android:layout_height="27dp"
             android:layout_alignParentBottom="true"
-<<<<<<< HEAD
             android:layout_marginEnd="-158dp"
             android:layout_marginBottom="0dp"
             android:layout_toStartOf="@+id/detail_km"
             android:background="@android:color/holo_red_light"
-=======
-            android:layout_marginStart="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginBottom="0dp"
-            android:background="@drawable/roundcornerbutton"
->>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
             android:text="Xem chi tiết"
             android:textColor="@android:color/background_light"
             android:textSize="16dp"
@@ -185,118 +149,18 @@
 
         <Button
             android:id="@+id/btnGo"
-            android:layout_width="142dp"
-            android:layout_height="29dp"
+            android:layout_width="157dp"
+            android:layout_height="26dp"
             android:layout_alignTop="@+id/btnShowDetail"
-<<<<<<< HEAD
             android:layout_alignParentEnd="true"
             android:layout_marginTop="1dp"
             android:layout_marginEnd="1dp"
             android:background="@android:color/holo_red_light"
-=======
-            android:layout_alignEnd="@+id/detail_OpenNow"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="-1dp"
-            android:background="@drawable/roundcornerbutton"
->>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
             android:drawableRight="@mipmap/icon_direction1"
             android:text="Chỉ đường"
             android:textColor="@android:color/background_light"
             android:textSize="16dp"
             android:textStyle="bold" />
-<<<<<<< HEAD
     </RelativeLayout>
 
-=======
-
-        <Button
-            android:id="@+id/btnDown"
-            android:layout_width="30dp"
-            android:layout_height="37dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="0dp"
-            android:background="@mipmap/icon_down" />
-
-
-    </RelativeLayout>
-
-
-    <LinearLayout
-        android:id="@+id/layoutmenu"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-        android:background="#F9F8F8"
-        android:orientation="horizontal"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtplaceName">
-
-        <Button
-            android:id="@+id/btnIncre"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/roundcornerbuttongray"
-            android:fontFamily="sans-serif"
-            android:text="+"
-            android:textSize="12dp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="113dp"
-            tools:textColor="#663366" />
-
-        <Button
-            android:id="@+id/btnDecre"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/roundcornerbuttongray"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:text="-"
-            android:textSize="12dp"
-            android:textStyle="bold"
-            tools:layout_editor_absoluteX="129dp"
-            tools:layout_editor_absoluteY="107dp"
-            tools:textColor="#663366" />
-
-        <Button
-            android:id="@+id/btnOtherPlaceSearch"
-            android:layout_width="268dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="24dp"
-            android:layout_marginRight="24dp"
-            android:background="@drawable/roundcornerbuttongray"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:text="Chọn địa điểm tìm kiếm"
-            android:textSize="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_editor_absoluteY="99dp" />
-
-    </LinearLayout>
-
-    <ToggleButton
-        android:id="@+id/toggleButton"
-        android:layout_width="57dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:background="@mipmap/ic_launcher_background"
-        android:text="ToggleButton"
-        app:layout_constraintEnd_toEndOf="@+id/txtplaceName"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
->>>>>>> 9632b8ba35aa1067c79a2bdfb081dbf8a873e929
 </android.support.constraint.ConstraintLayout>
