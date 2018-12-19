@@ -1,6 +1,7 @@
 package com.lkmt.tramluc.searchservice.Realm;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
@@ -8,6 +9,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.lkmt.tramluc.searchservice.MainActivity;
+import com.lkmt.tramluc.searchservice.MainActivityDelegate;
+import com.lkmt.tramluc.searchservice.MapsActivity;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.Opening_Hours;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.ResultDetailPlace;
@@ -24,7 +28,8 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class ServicesDB {
-    public static ArrayList<ResultDetailPlace> getDetailPlace(LatLng currentPo, String type, Double r, Realm realm){
+    public static ArrayList<ResultDetailPlace> getDetailPlace(LatLng currentPo, String type, Integer r){
+        Realm realm = Realm.getDefaultInstance();
         RealmResults<ResultDetailPlaceRealm> result = realm.where(ResultDetailPlaceRealm.class).equalTo("type",type).findAll();
         ArrayList<ResultDetailPlace> finalResult = new ArrayList<>();
         for (ResultDetailPlaceRealm element:result) {
@@ -37,8 +42,8 @@ public class ServicesDB {
                 double xxx = (x - xx) * (x - xx);
                 double yyy = (y - yy) * (y - yy);
                 double delta = Math.sqrt(xxx + yyy);
-                System.out.println(delta);
-                if (delta * 100 <= r) {
+                Log.d("delta", "getDetailPlace: " + delta*100000);
+                if (Math.round(delta * 100000) <= r) {
                     item.setDataFromRealm(element);
                     finalResult.add(item);
                 }
@@ -46,7 +51,7 @@ public class ServicesDB {
         }
         return finalResult;
     }
-    public static void addToRealm(){
+    public static void addToRealm(MainActivityDelegate callback){
         Realm realm = Realm.getDefaultInstance();
         try {
             realm.executeTransaction(realm1 -> realm.deleteAll()); // sync
@@ -55,10 +60,10 @@ public class ServicesDB {
             if (realm != null) {
                 realm.close();
             }
-            getDetailPlaceFromFireBase();
+            getDetailPlaceFromFireBase(callback);
         }
     }
-    public static void getDetailPlaceFromFireBase(){
+    public static void getDetailPlaceFromFireBase(MainActivityDelegate callback){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Services");
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -66,15 +71,21 @@ public class ServicesDB {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data:dataSnapshot.getChildren()) {
                     for (DataSnapshot dataNested : data.getChildren()) {
-                        ResultDetailPlace detail = dataNested.getValue(ResultDetailPlace.class);
-                        addDetailPlace(detail);
+                        if (MapsActivity.network) {
+                            ResultDetailPlace detail = dataNested.getValue(ResultDetailPlace.class);
+                            addDetailPlace(detail);
+                        }else{
+                            callback.stopSpinning(false);
+                            return;
+                        }
                     }
                 }
+                callback.stopSpinning(true);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                callback.stopSpinning(false);
             }
         });
     }
@@ -85,6 +96,7 @@ public class ServicesDB {
                 realm.executeTransaction(realm1 -> {
                     ResultDetailPlaceRealm result = realm.createObject(ResultDetailPlaceRealm.class);
                     result.setData(input, realm);
+                    Log.d("OKNA", "addDetailPlace: " + result.formatted_address);
                 });
             }
             finally {

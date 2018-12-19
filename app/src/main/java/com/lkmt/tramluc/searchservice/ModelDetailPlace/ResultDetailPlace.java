@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.lang.String;
@@ -37,19 +38,19 @@ public class ResultDetailPlace implements Parcelable {
         }
     }
     public void setDataFromRealm(ResultDetailPlaceRealm data){
-        formatted_address = new String(data.formatted_address);
-        formatted_phone_number = new String(data.formatted_phone_number);
-        name = new String(data.name);
-        rating = new Float(data.rating);
-        website = new String(data.website);
+        formatted_address = new String(data.formatted_address != null?data.formatted_address:"");
+        formatted_phone_number = new String(data.formatted_phone_number != null?data.formatted_phone_number:"");
+        name = new String(data.name != null ? data.name:data.name);
+        rating = new Float(data.rating != null ? data.rating:0);
+        website = new String(data.website != null ? data.website:"");
         if (data.opening_hours != null) {
             opening_hours = new Opening_Hours();
-            opening_hours.open_now = new Boolean(data.opening_hours.open_now);
-            opening_hours.weekday_text = castToArrayListString(data.opening_hours.weekday_text);
+            opening_hours.open_now = new Boolean(data.opening_hours.open_now != null ? data.opening_hours.open_now : false);
+            opening_hours.weekday_text = castToArrayListString(data.opening_hours.weekday_text != null ? data.opening_hours.weekday_text:new RealmList<>());
         }
-        latLng = new LatLngg(data.latLng);
-        castToArrayListReviews(data.reviews);
-        type = new String(data.type);
+        latLng = new LatLngg(data.latLng != null ? data.latLng : new LatLngg());
+        castToArrayListReviews(data.reviews != null ? data.reviews : new RealmList<>());
+        type = new String(data.type != null ? data.type : "");
     }
     @Override
     public int describeContents() {

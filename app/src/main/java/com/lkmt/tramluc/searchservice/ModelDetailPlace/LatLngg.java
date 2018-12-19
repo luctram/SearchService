@@ -16,6 +16,8 @@ public class LatLngg extends RealmObject {
         this.longitude = latlng.longitude;
     }
     public LatLngg() {
+        latitude = 0.0;
+        longitude = 0.0;
     }
 
     public LatLng getLatLng(){

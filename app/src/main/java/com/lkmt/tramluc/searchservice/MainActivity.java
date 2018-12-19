@@ -1,9 +1,14 @@
 package com.lkmt.tramluc.searchservice;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.Network;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,9 +18,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.firebase.jobdispatcher.Constraint;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.FirebaseApp;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.ResultDetailPlace;
 import com.lkmt.tramluc.searchservice.ModelMenu.Menu;
 import com.lkmt.tramluc.searchservice.ModelMenu.MenuAdapter;
@@ -25,31 +37,37 @@ import com.lkmt.tramluc.searchservice.Realm.ServicesDB;
 import com.lkmt.tramluc.searchservice.Realm.TypeServiceDB;
 
 import java.util.ArrayList;
-
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainActivityDelegate{
     private GoogleMap mMap;
     DatabaseReference mData;
     ListView listViewmenu;
     ArrayList<Menu> arrMenu;
     MenuAdapter adapter;
     Button btnUpdate;
+    private ProgressBar spinner;
     Realm realm;
+    IntentFilter intentFilter = new IntentFilter();
 
+
+
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseApp.initializeApp(this);
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder().name("myrealm.realm").build();
         Realm.setDefaultConfiguration(config);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(new NetworkChangeReceiver(), intentFilter);
         btnUpdate = (Button) findViewById(R.id.btnUpdate);
-
+        spinner = (ProgressBar) findViewById(R.id.progressBar);
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,16 +113,20 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
             builder1.setMessage("Quá trình cập nhập dữ liệu sẽ tốn vài phút. Bạn có muốn cập nhập không?");
             builder1.setCancelable(true);
-
             builder1.setPositiveButton(
-                    "Có",
+                    "Đồng ý",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            ServicesDB service = new ServicesDB();
-                            service.addToRealm();
+                            if(MapsActivity.network) {
+                                spinner.setVisibility(View.VISIBLE);
+                                listViewmenu.setEnabled(false);
+                                ServicesDB service = new ServicesDB();
+                                service.addToRealm(MainActivity.this);
+                            }else{
+                                Toast.makeText(MainActivity.this, "Vui lòng kiểm tra kết nối mạng", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
-
             builder1.setNegativeButton(
                     "Không",
                     new DialogInterface.OnClickListener() {
@@ -150,4 +172,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void stopSpinning(Boolean success) {
+        spinner.setVisibility(View.INVISIBLE);
+        listViewmenu.setEnabled(true);
+        if(success){
+            Toast.makeText(this, "Tải xuống hoàn tất", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Tải xuống thất bại, kiểm tra kết nối mạng.", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

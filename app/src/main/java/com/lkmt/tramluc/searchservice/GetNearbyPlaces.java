@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.CallBackMap;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.DetailPlace;
 import com.lkmt.tramluc.searchservice.ModelDetailPlace.LatLngg;
+import com.lkmt.tramluc.searchservice.ModelDetailPlace.ResultDetailPlace;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.transform.Result;
 
 public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
 
@@ -34,15 +37,28 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
     //private HashMap<String,LatLng> mData1;
     private List<DetailPlace> mData;
     public CallBackMap callback;
-    public void setCallBack(CallBackMap callback){
+    public void setCallBack(CallBackMap callback, GoogleMap mMap){
         this.callback = callback;
+        this.mMap = mMap;
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker){
+
+                if (mMarkers.get(marker.getId()) != null){
+                    int i = mMarkers.get(marker.getId());
+                    DetailPlace data = mData.get(i);
+                    callback.notifyViewStatus(data);
+                }
+                callback.notifyViewStatus(null);
+                return false;
+            }
+        });
     }
     @Override
     protected String doInBackground(Object... objects)
     {
         mMap = (GoogleMap) objects[0];
         url = (String) objects[1];
-
         DownloadUrl downloadUrl = new DownloadUrl();
         try
         {
@@ -71,13 +87,37 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
         }
     }
 
+    public void DisplayNearbyPlacesOffline(List<ResultDetailPlace> nearByPlacesList){
 
+        listMarkers = new ArrayList<>();
+        mMarkers = new HashMap<String, Integer>();
+        mData = new ArrayList<DetailPlace>();
+        // mData1 = new HashMap<String,LatLng>();
+        Services sv;
+        for (int i=0; i< nearByPlacesList.size(); i++)
+        {
+            ResultDetailPlace data = nearByPlacesList.get(i);
+            MarkerOptions markerOptions = new MarkerOptions();
+            String nameOfPlace = data.name;// name
+            String vicinity = data.formatted_address;// address
+            LatLng latLng = data.latLng.getLatLng();
+            markerOptions.position(latLng);
+            markerOptions.title(nameOfPlace + " : " + vicinity);
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+            DetailPlace temp = new DetailPlace();
+            temp.result = data;
+            mData.add(temp);
+            //  mData1.put(place_id,latLng);
+            Marker marker = mMap.addMarker(markerOptions);
+            mMarkers.put(marker.getId(),i);
+        }
+    }
     private void DisplayNearbyPlaces(List<HashMap<String, String>> nearByPlacesList) throws IOException
     {
         listMarkers = new ArrayList<>();
         mMarkers = new HashMap<String, Integer>();
         mData = new ArrayList<DetailPlace>();
-       // mData1 = new HashMap<String,LatLng>();
+        // mData1 = new HashMap<String,LatLng>();
         Services sv;
         for (int i=0; i< nearByPlacesList.size(); i++)
         {
@@ -100,20 +140,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
             Marker marker = mMap.addMarker(markerOptions);
             mMarkers.put(marker.getId(),i);
         }
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker){
 
-                        if (mMarkers.get(marker.getId()) != null){
-                            int i = mMarkers.get(marker.getId());
-                            DetailPlace data = mData.get(i);
-                            callback.notifyViewStatus(data);
-                        }
-                        callback.notifyViewStatus(null);
-                    return false;
-            }
-        });
     }
     private DetailPlace getDetailPlace(String placeid, LatLng latLng) throws IOException{
         String url = getDetailUrl(placeid);
