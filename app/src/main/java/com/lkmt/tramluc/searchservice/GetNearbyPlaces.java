@@ -48,6 +48,7 @@ public class GetNearbyPlaces extends AsyncTask<Object,Void,String> {
                     int i = mMarkers.get(marker.getId());
                     DetailPlace data = mData.get(i);
                     callback.notifyViewStatus(data);
+                    return false;
                 }
                 callback.notifyViewStatus(null);
                 return false;

@@ -22,7 +22,10 @@ public class ResultDetailPlace implements Parcelable {
     public LatLngg latLng;
     public ArrayList<Reviews> reviews;
     public String type;
-
+// do tuij nay chuaw khowri taoj
+    //toCopy là hàm của Parcelable
+    // lỗi đó nghĩa là WriteToParcel có 1 thằng dùng lệnh chứa tham số null
+    //DetailPlace.writeToParcel nghĩa là thằng Detail cũng chưa fĩ lỗi này
     private ArrayList<String> castToArrayListString(RealmList<String> list){
        ArrayList<String> a = new ArrayList<>();
         for (String item: list) {
@@ -59,17 +62,18 @@ public class ResultDetailPlace implements Parcelable {
     public ResultDetailPlace(){}
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(new String(formatted_address));
-        dest.writeString(new String(formatted_phone_number));
-        dest.writeString(new String(name));
-        dest.writeFloat(new Float(rating));
-        dest.writeString(new String(website));
-        dest.writeParcelable(opening_hours, flags);
-        dest.writeDouble(latLng.latitude);
-        dest.writeDouble(latLng.longitude);
+        dest.writeString(new String(formatted_address!=null?formatted_address:""));
+        dest.writeString(new String(formatted_phone_number!=null?formatted_phone_number:""));
+        dest.writeString(new String(name!=null?name:""));
+        dest.writeFloat(new Float(rating!=null?rating:0.0));
+
+        dest.writeString(new String(website!=null?website:""));
+        dest.writeParcelable(opening_hours!=null?opening_hours:new Opening_Hours(), flags);
+        dest.writeDouble(latLng!=null?latLng.latitude:0);
+        dest.writeDouble(latLng!=null?latLng.longitude:0);
         dest.writeByte((byte)(reviews!=null?1:0));
-        dest.writeTypedList(reviews);
-        dest.writeString(type);
+        dest.writeTypedList(reviews!=null?reviews:new ArrayList<>());
+        dest.writeString(type!=null?type:"");
     }
     /**
      * Retrieving Movie data from Parcel object

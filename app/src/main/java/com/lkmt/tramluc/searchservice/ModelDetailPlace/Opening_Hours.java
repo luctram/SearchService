@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,20 +13,23 @@ import io.realm.RealmObject;
 
 @JsonIgnoreProperties
 public class Opening_Hours implements Parcelable {
-    public Boolean open_now = false;
-    public ArrayList<String> weekday_text = new ArrayList<>();
+    public Boolean open_now;
+    public ArrayList<String> weekday_text;
 
     @Override
     public int describeContents() {
         return 0;
     }
-    public Opening_Hours(){}
+    public Opening_Hours(){
+        open_now = false;
+        weekday_text = new ArrayList<>();
+    }
 
     // Storing the Movie data to Parcel object
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte((byte)(open_now?1:0));
-        dest.writeStringList(weekday_text);
+        dest.writeStringList(weekday_text!=null?weekday_text: new ArrayList<>());
     }
 
     // A constructor that initializes the Movie object
@@ -36,6 +40,7 @@ public class Opening_Hours implements Parcelable {
      **/
     private Opening_Hours(Parcel in){
         this.open_now = in.readByte() != 0;
+        weekday_text = new ArrayList<>();
         in.readStringList(weekday_text);
     }
 

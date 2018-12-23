@@ -41,8 +41,6 @@ public class ShowDetailPlaceActivity extends AppCompatActivity {
 //
         Intent getData = getIntent();
         data = (DetailPlace) getData.getParcelableExtra("DataPlace");
-        dataHour = getData.getStringExtra("dataHour");
-        dataKm = getData.getStringExtra("dataKm");
 
         txtplaceName = findViewById(R.id.txtplaceName);
         txtplaceName.setText(new String(data.result.name));

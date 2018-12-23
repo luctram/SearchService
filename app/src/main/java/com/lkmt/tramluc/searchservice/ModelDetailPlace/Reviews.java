@@ -84,10 +84,10 @@ public class Reviews extends RealmObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int i) {
-        dest.writeString(author_name);
-        dest.writeString(relative_time_description);
-        dest.writeString(text);
-        dest.writeString(profile_photo_url);
+        dest.writeString(author_name!=null?author_name:"");
+        dest.writeString(relative_time_description!=null?relative_time_description:"");
+        dest.writeString(text!=null?text:"");
+        dest.writeString(profile_photo_url!=null?profile_photo_url:"");
         dest.writeFloat(rating);
 
     }

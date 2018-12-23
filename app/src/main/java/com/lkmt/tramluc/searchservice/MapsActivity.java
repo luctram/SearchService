@@ -326,8 +326,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLon
         btnShowDetail.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(MapsActivity.this, ShowDetailPlaceActivity.class);
+                if (placeData == null || placeData.result == null){
+                    Toast.makeText(MapsActivity.this, "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 intent.putExtra("DataPlace",placeData);
                 intent.putExtra("dataHour",directionsParser.duration.getText());
                 intent.putExtra("dataKm",directionsParser.distance.getText());
@@ -386,45 +389,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLon
         });
     }
 
-//    public void getAnotherAddress(String otherPlace){
-//        List<Address> addressList =null;
-//        if(otherPlace.trim() != ""){
-//            Geocoder geocoder = new Geocoder(this);
-//
-//            try {
-//                addressList = geocoder.getFromLocationName(otherPlace,1);
-//
-//                Log.d("CHECK123", addressList.size() +"");
-//                if(addressList.size() == 0){
-//                    addressList = geocoder.getFromLocationName(otherPlace,1);
-//                }
-//                if (addressList.size() >0){
-//                    Address add = addressList.get(0);
-//                    Log.d("CHECK1234", add.getLatitude() + "  " + add.getLongitude());
-//                    LatLng latLngPlace = new LatLng(add.getLatitude(),add.getLongitude());
-//                    MarkerOptions markerOptions = new MarkerOptions();
-//                        markerOptions.position(latLngPlace);
-//                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//                        mMap.addMarker(markerOptions);
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLngPlace));
-//                        mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
-//
-//                    nearPlaces(place, latLngPlace.latitude,latLngPlace.longitude,ProximityRadius);
-//                }
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
     @Override
     public void onLocationChanged(Location location)
     {
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-    //        Realm realm = Realm.getDefaultInstance();
-//        ArrayList<ResultDetailPlace> list = ServicesDB.getDetailPlace(new LatLng(location.getLatitude(),location.getLongitude()),"restaurant", 2.0, realm);
         CameraUpdate camera = CameraUpdateFactory.newLatLngZoom(
                 latLng, 15);
         mMap.moveCamera(camera);
@@ -492,7 +461,12 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLon
 
     @Override
     public void notifyViewStatus(final DetailPlace data) {
-        if (data == null) return;
+        if (data == null || data.result == null) {
+            Toast.makeText(this, "Lỗi kết nối không ổn định", Toast.LENGTH_SHORT).show();
+            detailTable.setVisibility(View.INVISIBLE);
+            return;
+        }
+
         detailTable.setVisibility(View.VISIBLE); // Hien thi detail
         detailName.setText(data.result.name != null ? data.result.name : "");
         detailAddress.setText(data.result.formatted_address != null ? data.result.formatted_address : "");
@@ -621,7 +595,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLon
         listViewDirection = (ListView) findViewById(R.id.listviewDirection);
         arrDirection = new ArrayList<StepsDirection>();
         for(int i =0 ; i < directionsParser.totalStepsDirection; i++){
-            arrDirection.add(new StepsDirection(directionsParser.stepsDirections.get(i).getDurationStep(),directionsParser.stepsDirections.get(i).getDistanceStep(),directionsParser.stepsDirections.get(i).getDescribe()));
+            String temp = directionsParser.stepsDirections.get(i).getDescribe().replaceAll("<.*?>","");
+            arrDirection.add(new StepsDirection(directionsParser.stepsDirections.get(i).getDurationStep(),directionsParser.stepsDirections.get(i).getDistanceStep(),temp));
         }
 
         adapterDirection = new StepsDirectionAdapter(this, R.layout.row_listview_stepsdirection,arrDirection);
@@ -635,10 +610,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLon
         layoutmenu.setVisibility(View.VISIBLE);
         LatLng latLngPlace = place1.getLatLng();
 
-//        MarkerOptions markerOptions = new MarkerOptions();
-//        markerOptions.position(latLngPlace);
-//        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//        mMap.addMarker(markerOptions);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
                 latLngPlace, 15);
         mMap.moveCamera(location);
